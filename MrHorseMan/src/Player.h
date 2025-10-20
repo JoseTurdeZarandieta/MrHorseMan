@@ -3,6 +3,7 @@
 #include "Entity.h"
 #include <box2d/box2d.h>
 #include <SDL3/SDL.h>
+#include "Animation.h"
 
 struct SDL_Texture;
 
@@ -45,5 +46,5 @@ public:
 private: 
 	b2Vec2 velocity;
 	// L10: TODO 4: Declare an AnimationSet to hold all player animations
-
+	AnimationSet anims;
 };

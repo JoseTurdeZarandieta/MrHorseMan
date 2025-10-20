@@ -30,10 +30,12 @@ bool Player::Start() {
 
 	//L03: TODO 2: Initialize Player parameters
 	//L10: TODO 3; Load the spritesheet of the player
-	texture = Engine::GetInstance().textures->Load("Assets/Textures/player1.png");
+	texture = Engine::GetInstance().textures->Load("Assets/Textures/player2_spritesheet.png");
 
 	//L10: TODO 3: Load the spritesheet animations from the TSX file
-
+	std::unordered_map<int, std::string> animNames = { {0, "idle"}, {11, "move"}, {22, "jump"} };
+	anims.LoadFromTSX("Assets/Textures/player2_spritesheet.tsx", animNames);
+	anims.SetCurrent("idle");
 	// L08 TODO 5: Add physics to the player - initialize physics body
 	texW = 32;
 	texH = 32;
@@ -63,18 +65,19 @@ bool Player::Update(float dt)
 	if (Engine::GetInstance().input->GetKey(SDL_SCANCODE_A) == KEY_REPEAT) {
 		velocity.x = -speed;
 		//L10: TODO 6: Update the animation based on the player's state
-
+		anims.SetCurrent("move");
 	}
 	if (Engine::GetInstance().input->GetKey(SDL_SCANCODE_D) == KEY_REPEAT) {
 		velocity.x = speed;
 		//L10: TODO 6: Update the animation based on the player's state
-
+		anims.SetCurrent("move");
 	}
 
 	// Jump (impulse once)
 	if (Engine::GetInstance().input->GetKey(SDL_SCANCODE_SPACE) == KEY_DOWN && isJumping == false) {
 		physics->ApplyLinearImpulseToCenter(pbody, 0.0f, -jumpForce, true);
 		//L10: TODO 6: Update the animation based on the player's state
+		anims.SetCurrent("jump");
 		isJumping = true;
 	}
 
@@ -87,6 +90,8 @@ bool Player::Update(float dt)
 	physics->SetLinearVelocity(pbody, velocity);
 
 	// L10: TODO 5: Update the animation based on the player's state (moving, jumping, idle)
+	anims.Update(dt);
+	SDL_Rect animFrame =  anims.GetCurrentFrame();
 
 	// Update render position using your PhysBody helper
 	int x, y;
@@ -95,9 +100,15 @@ bool Player::Update(float dt)
 	position.setY((float)y);
 
 	//L10: TODO 7: Center the camera on the player
+	float limitLeft = Engine::GetInstance().render->camera.w / 4;
+	float limitRight = Engine::GetInstance().map->GetMapSizeInPixels().getX() - Engine::GetInstance().render->camera.w * 3/ 4;;
+	if (position.getX() - limitLeft > 0 && position.getX() < limitRight) {
+		Engine::GetInstance().render->camera.x = -position.getX() + Engine::GetInstance().render->camera.w / 4;
 
+	}
+	
 	// L10: TODO 5: Draw the player using the texture and the current animation frame
-	Engine::GetInstance().render->DrawTexture(texture, x - texW / 2, y - texH / 2);
+	Engine::GetInstance().render->DrawTexture(texture, x - texW / 2, y - texH / 2, &animFrame);
 	return true;
 }
 
@@ -117,7 +128,7 @@ void Player::OnCollision(PhysBody* physA, PhysBody* physB) {
 		//reset the jump flag when touching the ground
 		isJumping = false;
 		//L10: TODO 6: Update the animation based on the player's state
-
+		anims.SetCurrent("idle");
 		break;
 	case ColliderType::ITEM:
 		LOG("Collision ITEM");
