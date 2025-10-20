@@ -9,10 +9,33 @@ struct Properties
 {
     struct Property
     {
-
+        std::string name;
+        bool value; //We assume that we are going to work only with bool for the moment
     };
 
-    // L09: TODO 7: Implement a method to get the value of a custom property
+    std::list<Property*> propertyList;
+
+    ~Properties()
+    {
+        for (const auto& property : propertyList)
+        {
+            delete property;
+        }
+
+        propertyList.clear();
+    }
+
+    // L09: DONE 7: Method to ask for the value of a custom property
+    Property* GetProperty(const char* name)
+    {
+        for (const auto& property : propertyList) {
+            if (property->name == name) {
+                return property;
+            }
+        }
+
+        return nullptr;
+    }
 
 };
 
@@ -24,11 +47,12 @@ struct MapLayer
     int width;
     int height;
     std::vector<int> tiles;
+    Properties properties;
 
     // L07: TODO 6: Short function to get the gid value of i,j
     unsigned int Get(int i, int j) const
     {
-        return tiles[(i * width) + j];
+        return tiles[(j * width) + i];
     }
 };
 
@@ -100,13 +124,16 @@ public:
     bool Load(std::string path, std::string mapFileName);
 
     // L07: TODO 8: Create a method that translates x,y coordinates from map positions to world positions
-    Vector2D MapToWorld(int i, int j) const;
+    Vector2D MapToWorld(int x, int y) const;
 
     // L09: TODO 2: Implement function to the Tileset based on a tile id
     TileSet* GetTilesetFromTileId(int gid) const;
 
     // L09: TODO 6: Load a group of properties 
     bool LoadProperties(pugi::xml_node& node, Properties& properties);
+
+	// L10: TODO 7: Create a method to get the map size in pixels
+	Vector2D GetMapSizeInPixels();
 
 public: 
     std::string mapFileName;

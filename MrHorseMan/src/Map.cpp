@@ -40,24 +40,28 @@ bool Map::Update(float dt)
         // L07 TODO 5: Prepare the loop to draw all tiles in a layer + DrawTexture()
         // iterate all tiles in a layer
         for (const auto& mapLayer : mapData.layers) {
-            for (int i = 0; i < mapData.height; i++) {
-                for (int j = 0; j < mapData.width; j++) {
-                    // L07 TODO 9: Complete the draw function
+            //L09 TODO 7: Check if the property Draw exist get the value, if it's true draw the lawyer
+            if (mapLayer->properties.GetProperty("Draw") != NULL && mapLayer->properties.GetProperty("Draw")->value == true) {
+                for (int i = 0; i < mapData.width; i++) {
+                    for (int j = 0; j < mapData.height; j++) {
 
-                    //Get the gid from tile
-                    int gid = mapLayer->Get(i, j);
+                        // L07 TODO 9: Complete the draw function
 
-                    //Check if the gid is different from 0 - some tiles are empty
-                    if (gid != 0) {
-                        //L09: TODO 3: Obtain the tile set using GetTilesetFromTileId
-                        TileSet* tileSet = mapData.tilesets.front();
-                        if (tileSet != nullptr) {
-                            //Get the Rect from the tileSetTexture;
-                            SDL_Rect tileRect = tileSet->GetRect(gid);
-                            //Get the screen coordinates from the tile coordinates
-                            Vector2D mapCoord = MapToWorld(i, j);
-                            //Draw the texture
-                            Engine::GetInstance().render->DrawTexture(tileSet->texture, (int)mapCoord.getX(), (int)mapCoord.getY(), &tileRect);
+                        //Get the gid from tile
+                        int gid = mapLayer->Get(i, j);
+
+                        //Check if the gid is different from 0 - some tiles are empty
+                        if (gid != 0) {
+                            //L09: TODO 3: Obtain the tile set using GetTilesetFromTileId
+                            TileSet* tileSet = mapData.tilesets.front();
+                            if (tileSet != nullptr) {
+                                //Get the Rect from the tileSetTexture;
+                                SDL_Rect tileRect = tileSet->GetRect(gid);
+                                //Get the screen coordinates from the tile coordinates
+                                Vector2D mapCoord = MapToWorld(i, j);
+                                //Draw the texture
+                                Engine::GetInstance().render->DrawTexture(tileSet->texture, (int)mapCoord.getX(), (int)mapCoord.getY(), &tileRect);
+                            }
                         }
                     }
                 }
@@ -159,6 +163,7 @@ bool Map::Load(std::string path, std::string fileName)
             mapLayer->height = layerNode.attribute("height").as_int();
 
             //L09: TODO 6 Call Load Layer Properties
+            LoadProperties(layerNode, mapLayer->properties);
 
             //Iterate over all the tiles and assign the values in the data array
             for (pugi::xml_node tileNode = layerNode.child("data").child("tile"); tileNode != NULL; tileNode = tileNode.next_sibling("tile")) {
@@ -172,23 +177,22 @@ bool Map::Load(std::string path, std::string fileName)
         // L08 TODO 3: Create colliders
         // L08 TODO 7: Assign collider type
         // Later you can create a function here to load and create the colliders from the map
-		Vector2D posC1 = Vector2D(224, 544);
-		int widthC1 = 256;
-		int heightC1 = 64;
-        PhysBody* c1 = Engine::GetInstance().physics.get()->CreateRectangle((int)posC1.getX() + widthC1 / 2, (int)posC1.getY() + heightC1 / 2, widthC1, heightC1, STATIC);
-        c1->ctype = ColliderType::PLATFORM;
 
-        Vector2D posC2 = Vector2D(352, 384);
-        int widthC2 = 128;
-        int heightC2 = 64;
-        PhysBody* c2 = Engine::GetInstance().physics.get()->CreateRectangle((int)posC2.getX() + widthC2 / 2, (int)posC2.getY() + heightC2 / 2, widthC2, heightC1, STATIC);
-        c2->ctype = ColliderType::PLATFORM;
-
-        Vector2D posC3 = Vector2D(0, 704);
-        int widthC3 = 544;
-        int heightC3 = 64;
-        PhysBody* c3 = Engine::GetInstance().physics.get()->CreateRectangle((int)posC3.getX() + widthC3 / 2, (int)posC3.getY() + heightC3 / 2, widthC3, heightC3, STATIC);
-        c3->ctype = ColliderType::PLATFORM; 
+        //Iterate the layer and create colliders
+        for (const auto& mapLayer : mapData.layers) {
+            if (mapLayer->name == "Collisions") {
+                for (int i = 0; i < mapData.width; i++) {
+                    for (int j = 0; j < mapData.height; j++) {
+                        int gid = mapLayer->Get(i, j);
+                        if (gid == 49) {
+                            Vector2D mapCoord = MapToWorld(i, j);
+                            PhysBody* c1 = Engine::GetInstance().physics.get()->CreateRectangle(mapCoord.getX()+ mapData.tileWidth/2, mapCoord.getY()+ mapData.tileHeight/2, mapData.tileWidth, mapData.tileHeight, STATIC);
+                            c1->ctype = ColliderType::PLATFORM;
+                        }
+                    }
+                }
+            }
+        }
 
         ret = true;
 
@@ -227,12 +231,12 @@ bool Map::Load(std::string path, std::string fileName)
 }
 
 // L07: TODO 8: Create a method that translates x,y coordinates from map positions to world positions
-Vector2D Map::MapToWorld(int i, int j) const
+Vector2D Map::MapToWorld(int x, int y) const
 {
     Vector2D ret;
 
-    ret.setX((float)(j * mapData.tileWidth));
-    ret.setY((float)(i * mapData.tileHeight));
+    ret.setX((float)(x * mapData.tileWidth));
+    ret.setY((float)(y * mapData.tileHeight));
 
     return ret;
 }
@@ -240,9 +244,29 @@ Vector2D Map::MapToWorld(int i, int j) const
 // L09: TODO 6: Load a group of properties from a node and fill a list with it
 bool Map::LoadProperties(pugi::xml_node& node, Properties& properties)
 {
-    bool ret = true;
+    bool ret = false;
+
+    for (pugi::xml_node propertieNode = node.child("properties").child("property"); propertieNode; propertieNode = propertieNode.next_sibling("property"))
+    {
+        Properties::Property* p = new Properties::Property();
+        p->name = propertieNode.attribute("name").as_string();
+        p->value = propertieNode.attribute("value").as_bool(); // (!!) I'm assuming that all values are bool !!
+
+        properties.propertyList.push_back(p);
+    }
 
     return ret;
 }
+
+// L10: TODO 7: Create a method to get the map size in pixels
+Vector2D Map::GetMapSizeInPixels()
+{
+    Vector2D sizeInPixels;
+    sizeInPixels.setX((float)(mapData.width * mapData.tileWidth));
+    sizeInPixels.setY((float)(mapData.height * mapData.tileHeight));
+    return sizeInPixels;
+}
+
+
 
 
