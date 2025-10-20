@@ -47,4 +47,5 @@ private:
 	b2Vec2 velocity;
 	// L10: TODO 4: Declare an AnimationSet to hold all player animations
 	AnimationSet anims;
+	SDL_FlipMode flip = SDL_FLIP_NONE;
 };

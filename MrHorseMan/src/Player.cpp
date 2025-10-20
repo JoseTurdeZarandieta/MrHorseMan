@@ -30,11 +30,11 @@ bool Player::Start() {
 
 	//L03: TODO 2: Initialize Player parameters
 	//L10: TODO 3; Load the spritesheet of the player
-	texture = Engine::GetInstance().textures->Load("Assets/Textures/player2_spritesheet.png");
+	texture = Engine::GetInstance().textures->Load("Assets/Textures/MrHorseMan_spritesheet.png");
 
 	//L10: TODO 3: Load the spritesheet animations from the TSX file
-	std::unordered_map<int, std::string> animNames = { {0, "idle"}, {11, "move"}, {22, "jump"} };
-	anims.LoadFromTSX("Assets/Textures/player2_spritesheet.tsx", animNames);
+	std::unordered_map<int, std::string> animNames = { {0, "idle"}, {6, "move"}, {12, "jump"} };
+	anims.LoadFromTSX("Assets/Textures/MrHorseMan_spritesheet.tsx", animNames);
 	anims.SetCurrent("idle");
 	// L08 TODO 5: Add physics to the player - initialize physics body
 	texW = 32;
@@ -66,11 +66,13 @@ bool Player::Update(float dt)
 		velocity.x = -speed;
 		//L10: TODO 6: Update the animation based on the player's state
 		anims.SetCurrent("move");
+		flip = SDL_FLIP_HORIZONTAL; //flips the player's character when moving left
 	}
 	if (Engine::GetInstance().input->GetKey(SDL_SCANCODE_D) == KEY_REPEAT) {
 		velocity.x = speed;
 		//L10: TODO 6: Update the animation based on the player's state
 		anims.SetCurrent("move");
+		flip = SDL_FLIP_NONE;
 	}
 
 	// Jump (impulse once)
@@ -108,7 +110,7 @@ bool Player::Update(float dt)
 	}
 	
 	// L10: TODO 5: Draw the player using the texture and the current animation frame
-	Engine::GetInstance().render->DrawTexture(texture, x - texW / 2, y - texH / 2, &animFrame);
+	Engine::GetInstance().render->DrawTexture(texture, x - texW / 2, y - 1.5*texH, &animFrame, 1.0f, 0.0, INT_MAX, INT_MAX, flip);
 	return true;
 }
 
