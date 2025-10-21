@@ -279,3 +279,9 @@ bool Render::DrawCircle(int x, int y, int radius, Uint8 r, Uint8 g, Uint8 b, Uin
 
 	return ret;
 }
+
+void Render::SetVSync(bool enabled) {
+	if (SDL_SetRenderVSync(renderer, enabled ? 1 : 0) != 0) {
+		LOG("SDL_SetRenderVSync failed: %s", SDL_GetError());
+	}
+}

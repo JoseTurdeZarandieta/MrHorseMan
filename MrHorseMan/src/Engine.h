@@ -45,6 +45,10 @@ public:
 		return dt;
 	}
 
+	void ToggleVSync();
+	void Toggle30FpsCap();
+
+
 private:
 
 	// Private constructor to prevent instantiation
@@ -124,8 +128,11 @@ private:
 
 	//Maximun frame duration in miliseconds.
 	int targetFrameRate = 60;
+	bool vsyncEnabled = false;
+	bool cap30 = false;
 
-	std::string gameTitle = "Platformer Game";
+
+	std::string gameTitle = "Mr HorseMan Game";
 
 	//L05 TODO 2: Declare a xml_document to load the config file
 	pugi::xml_document configFile;

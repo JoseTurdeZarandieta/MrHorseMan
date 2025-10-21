@@ -84,6 +84,8 @@ bool Engine::Awake() {
     gameTitle = configFile.child("config").child("engine").child("title").child_value();
     targetFrameRate = configFile.child("config").child("engine").child("targetFrameRate").attribute("value").as_int();
 
+    vsyncEnabled = configFile.child("config").child("render").child("vsync").attribute("value").as_bool(false);
+
     //Iterates the module list and calls Awake on each module
     bool result = true;
     for (const auto& module : moduleList) {
@@ -118,6 +120,7 @@ bool Engine::Start() {
             break;
         }
     }
+    render->SetVSync(vsyncEnabled);
 
     // L2: TODO 3: Log the result of the timer
 	LOG("Timer App CleanUp(): %f", timer.ReadMSec());
@@ -179,17 +182,29 @@ void Engine::PrepareUpdate()
 // ---------------------------------------------
 void Engine::FinishUpdate()
 {
-    // L03: TODO 1: Cap the framerate of the gameloop
-    double currentDt = frameTime.ReadMs();
-	float maxFrameDuration = 1000.0f / targetFrameRate;
-    if (targetFrameRate > 0 && currentDt < maxFrameDuration) {
-        Uint32 delay = (Uint32)(maxFrameDuration - currentDt);
+ //   // L03: TODO 1: Cap the framerate of the gameloop
+ //   double currentDt = frameTime.ReadMs();
+	//float maxFrameDuration = 1000.0f / targetFrameRate;
+ //   if (targetFrameRate > 0 && currentDt < maxFrameDuration) {
+ //       Uint32 delay = (Uint32)(maxFrameDuration - currentDt);
 
-        // L03: TODO 2: Measure accurately the amount of time SDL_Delay() actually waits compared to what was expected
-        PerfTimer delayTimer = PerfTimer();
-        SDL_Delay(delay);
-        //Measure accurately the amount of time SDL_Delay() actually waits compared to what was expected
-        //LOG("We waited for %I32u ms and got back in %f ms",delay,delayTimer.ReadMs()); // Uncomment this line to see the results
+ //       // L03: TODO 2: Measure accurately the amount of time SDL_Delay() actually waits compared to what was expected
+ //       PerfTimer delayTimer = PerfTimer();
+ //       SDL_Delay(delay);
+ //       //Measure accurately the amount of time SDL_Delay() actually waits compared to what was expected
+ //       //LOG("We waited for %I32u ms and got back in %f ms",delay,delayTimer.ReadMs()); // Uncomment this line to see the results
+ //   }
+
+
+    double currentMs = frameTime.ReadMs();
+    int desiredFps = cap30 ? 30 : targetFrameRate;
+    if (!vsyncEnabled && desiredFps > 0) {
+        float maxFrameMs = 1000.0f / desiredFps;
+        if (currentMs < maxFrameMs) {
+            Uint32 delay = (Uint32)(maxFrameMs - currentMs);
+            PerfTimer delayTimer = PerfTimer();
+            SDL_Delay(delay);
+        }
     }
 
 	// L2: TODO 4: Calculate:
@@ -220,18 +235,37 @@ void Engine::FinishUpdate()
     ss << gameTitle << ": Av.FPS: " << std::fixed << std::setprecision(2) << averageFps
         << " Last sec frames: " << framesPerSecond
         << " Last dt: " << std::fixed << std::setprecision(3) << dt
-        << " Time since startup: " << secondsSinceStartup
-        << " Frame Count: " << frameCount;
+        /*<< " Time since startup: " << secondsSinceStartup
+        << " Frame Count: " << frameCount*/
+        << " VSync: " << (vsyncEnabled ? "ON" : "OFF")
+        << " Cap: " << (vsyncEnabled ? "VSync" : (cap30 ? "30" : std::to_string(targetFrameRate)));
+
 
     std::string titleStr = ss.str();
 
     window.get()->SetTitle(titleStr.c_str());
 }
 
+void Engine::Toggle30FpsCap() {
+    cap30 = !cap30;
+}
+
+void Engine::ToggleVSync() {
+    vsyncEnabled = !vsyncEnabled;
+    render->SetVSync(vsyncEnabled);
+}
+
 
 // Call modules before each loop iteration
 bool Engine::PreUpdate()
 {
+    if (input->GetKey(SDL_SCANCODE_F11) == KEY_DOWN) {
+        Toggle30FpsCap();
+    }
+    if (input->GetKey(SDL_SCANCODE_F12) == KEY_DOWN) {
+        ToggleVSync();
+    }
+
     //Iterates the module list and calls PreUpdate on each module
     bool result = true;
     for (const auto& module : moduleList) {
