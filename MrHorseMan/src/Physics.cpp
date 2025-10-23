@@ -468,6 +468,25 @@ void Physics::DrawSolidCircleCb(b2Transform xf, float radius, b2HexColor color, 
     DrawCircleCb(xf.p, radius, color, ctx);
 }
 
+void Physics::SetTransform(PhysBody* body, float x, float y) {
+    if (!body) return;
+
+    b2BodyId id = body->body; 
+    if (!b2Body_IsValid(id)) return;
+
+    b2Vec2 zero{ 0.0f, 0.0f };
+
+    b2Body_SetLinearVelocity(id, zero); //sets velocity @ 0
+
+    b2Transform xf = b2Body_GetTransform(id);
+    b2Vec2 newPos{ x,y };
+
+    b2Body_SetTransform(id, newPos, xf.q);
+    b2Body_SetAwake(id, true);
+}
+
+
+
 // ---- No-op stubs to avoid null calls -----------------------
 void Physics::DrawSolidCapsuleStub(b2Vec2, b2Vec2, float, b2HexColor, void*) {}
 void Physics::DrawPointStub(b2Vec2, float, b2HexColor, void*) {}

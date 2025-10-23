@@ -23,6 +23,8 @@ bool Player::Awake() {
 
 	//L03: TODO 2: Initialize Player parameters
 	position = Vector2D(96, 96);
+	spawnPos = position;
+	health = maxHealth;
 	return true;
 }
 
@@ -46,6 +48,7 @@ bool Player::Start() {
 
 	// L08 TODO 7: Assign collider type
 	pbody->ctype = ColliderType::PLAYER;
+	//Engine::GetInstance().physics->SetTransform(pbody, spawnPos.getX(), spawnPos.getY());
 
 	//initialize audio effect
 	pickCoinFxId = Engine::GetInstance().audio->LoadFx("Assets/Audio/Fx/coin-collision-sound-342335.wav");
@@ -83,35 +86,55 @@ bool Player::Update(float dt)
 		isJumping = true;
 	}
 
-	// Preserve vertical speed while jumping
-	if (isJumping == true) {
-		velocity.y = physics->GetYVelocity(pbody);
+// Preserve vertical speed while jumping
+if (isJumping == true) {
+	velocity.y = physics->GetYVelocity(pbody);
+
+	if (velocity.y > maxDownwardSpeed) {
+		maxDownwardSpeed = velocity.y;
 	}
+}
 
-	// Apply velocity via helper
-	physics->SetLinearVelocity(pbody, velocity);
+// Apply velocity via helper
+physics->SetLinearVelocity(pbody, velocity);
 
-	// L10: TODO 5: Update the animation based on the player's state (moving, jumping, idle)
-	anims.Update(dt);
-	SDL_Rect animFrame =  anims.GetCurrentFrame();
+if (health <= 0) {
+	Respawn();
+}
+// L10: TODO 5: Update the animation based on the player's state (moving, jumping, idle)
+anims.Update(dt);
+SDL_Rect animFrame = anims.GetCurrentFrame();
 
-	// Update render position using your PhysBody helper
-	int x, y;
-	pbody->GetPosition(x, y);
-	position.setX((float)x);
-	position.setY((float)y);
+// Update render position using your PhysBody helper
+int x, y;
+pbody->GetPosition(x, y);
+position.setX((float)x);
+position.setY((float)y);
 
-	//L10: TODO 7: Center the camera on the player
-	float limitLeft = Engine::GetInstance().render->camera.w / 4;
-	float limitRight = Engine::GetInstance().map->GetMapSizeInPixels().getX() - Engine::GetInstance().render->camera.w * 3/ 4;;
-	if (position.getX() - limitLeft > 0 && position.getX() < limitRight) {
-		Engine::GetInstance().render->camera.x = -position.getX() + Engine::GetInstance().render->camera.w / 4;
+//L10: TODO 7: Center the camera on the player
+float limitLeft = Engine::GetInstance().render->camera.w / 4;
+float limitRight = Engine::GetInstance().map->GetMapSizeInPixels().getX() - Engine::GetInstance().render->camera.w * 3 / 4;;
+if (position.getX() - limitLeft > 0 && position.getX() < limitRight) {
+	Engine::GetInstance().render->camera.x = -position.getX() + Engine::GetInstance().render->camera.w / 4;
 
-	}
-	
-	// L10: TODO 5: Draw the player using the texture and the current animation frame
-	Engine::GetInstance().render->DrawTexture(texture, x - texW / 2, y - 1.5*texH, &animFrame, 1.0f, 0.0, INT_MAX, INT_MAX, flip);
-	return true;
+}
+
+// L10: TODO 5: Draw the player using the texture and the current animation frame
+Engine::GetInstance().render->DrawTexture(texture, x - texW / 2, y - 1.7 * texH, &animFrame, 1.0f, 0.0, INT_MAX, INT_MAX, flip);
+
+//health screen display
+char hpText[32];
+snprintf(hpText, sizeof(hpText), "HP: %d", health);
+
+int screenW = Engine::GetInstance().render->camera.w;
+int margin = 12;
+int posTextX = -Engine::GetInstance().render->camera.w + (screenW - 100);
+int posTextY = Engine::GetInstance().render->camera.y + margin;
+
+Engine::GetInstance().render->DrawText(hpText, posTextX, posTextY);
+
+
+return true;
 }
 
 bool Player::CleanUp()
@@ -127,6 +150,14 @@ void Player::OnCollision(PhysBody* physA, PhysBody* physB) {
 	{
 	case ColliderType::PLATFORM:
 		LOG("Collision PLATFORM");
+		if (isJumping) {
+			if (maxDownwardSpeed > fallSpeedDamageThreshold) {
+				float t = (std::min(maxDownwardSpeed, fallSpeedMax) - fallSpeedDamageThreshold) / std::max(0.001f, (fallSpeedMax - fallSpeedDamageThreshold));
+				int dmg = (int)(t * 60.0f);
+				TakeDamage(dmg);
+			}
+			maxDownwardSpeed = 0.0f;
+		}
 		//reset the jump flag when touching the ground
 		isJumping = false;
 		//L10: TODO 6: Update the animation based on the player's state
@@ -137,6 +168,8 @@ void Player::OnCollision(PhysBody* physA, PhysBody* physB) {
 		Engine::GetInstance().audio->PlayFx(pickCoinFxId);
 		physB->listener->Destroy();
 		break;
+	case ColliderType::ENEMY:
+		TakeDamage(10);
 	case ColliderType::UNKNOWN:
 		LOG("Collision UNKNOWN");
 		break;
@@ -151,6 +184,7 @@ void Player::OnCollisionEnd(PhysBody* physA, PhysBody* physB)
 	{
 	case ColliderType::PLATFORM:
 		LOG("End Collision PLATFORM");
+		isJumping = true;
 		break;
 	case ColliderType::ITEM:
 		LOG("End Collision ITEM");
@@ -163,3 +197,29 @@ void Player::OnCollisionEnd(PhysBody* physA, PhysBody* physB)
 	}
 }
 
+void Player::TakeDamage(int amount) {
+	if (amount <= 0){
+		return;
+	}
+	health -= amount;
+	if (health <= 0) {
+		health = 0;
+	}
+}
+
+void Player::HealToFull() {
+	health = maxHealth;
+}
+
+void Player::Respawn() {
+	HealToFull();
+
+	Physics* physics = Engine::GetInstance().physics.get();
+	physics->SetLinearVelocity(pbody, { 0,0 });
+	physics->SetTransform(pbody, spawnPos.getX(), spawnPos.getY());
+
+	isJumping = false;
+	anims.SetCurrent("idle");
+
+	Engine::GetInstance().entityManager->resetEnemiesToSpwan();
+}
