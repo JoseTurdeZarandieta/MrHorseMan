@@ -48,4 +48,8 @@ private:
 	// L10: TODO 4: Declare an AnimationSet to hold all player animations
 	AnimationSet anims;
 	SDL_FlipMode flip = SDL_FLIP_NONE;
+
+	bool isGrounded = false;
+	int jumpCount = 0;
+	const int maxJumps = 2; // 1 ground + 1 air (double jump)
 };

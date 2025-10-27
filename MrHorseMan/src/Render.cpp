@@ -166,7 +166,7 @@ bool Render::DrawTexture(SDL_Texture* texture, int x, int y, const SDL_Rect* sec
 	}
 
 	// SDL3: returns bool; map to int-style check
-	int rc = SDL_RenderTextureRotated(renderer, texture, src, &rect, angle, p, SDL_FLIP_NONE) ? 0 : -1;
+	int rc = SDL_RenderTextureRotated(renderer, texture, src, &rect, angle, p, flip) ? 0 : -1; 
 	if (rc != 0)
 	{
 		LOG("Cannot blit to screen. SDL_RenderTextureRotated error: %s", SDL_GetError());
