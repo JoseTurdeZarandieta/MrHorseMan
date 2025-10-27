@@ -77,10 +77,16 @@ bool Player::Update(float dt)
 
 	// Jump (impulse once)
 	if (Engine::GetInstance().input->GetKey(SDL_SCANCODE_SPACE) == KEY_DOWN && isJumping == false) {
+
+		b2Vec2 vel = physics->GetLinearVelocity(pbody);
+		vel.y = 0.0f;
+		physics->SetLinearVelocity(pbody, vel);
+
 		physics->ApplyLinearImpulseToCenter(pbody, 0.0f, -jumpForce, true);
 		//L10: TODO 6: Update the animation based on the player's state
 		anims.SetCurrent("jump");
 		isJumping = true;
+
 	}
 
 	// Preserve vertical speed while jumping
