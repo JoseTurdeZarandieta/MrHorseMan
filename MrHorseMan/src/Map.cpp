@@ -53,7 +53,7 @@ bool Map::Update(float dt)
                         //Check if the gid is different from 0 - some tiles are empty
                         if (gid != 0) {
                             //L09: TODO 3: Obtain the tile set using GetTilesetFromTileId
-                            TileSet* tileSet = mapData.tilesets.front();
+                            TileSet* tileSet = GetTilesetFromTileId(gid);
                             if (tileSet != nullptr) {
                                 //Get the Rect from the tileSetTexture;
                                 SDL_Rect tileRect = tileSet->GetRect(gid);
@@ -75,8 +75,13 @@ bool Map::Update(float dt)
 // L09: TODO 2: Implement function to the Tileset based on a tile id
 TileSet* Map::GetTilesetFromTileId(int gid) const
 {
-	TileSet* set = nullptr;
-
+    TileSet* set = nullptr;
+    for (const auto& tileset : mapData.tilesets) {
+        set = tileset;
+        if (gid >= tileset->firstGid && gid < tileset->firstGid + tileset->tileCount) {
+            break;
+        }
+    }
     return set;
 }
 
@@ -184,7 +189,7 @@ bool Map::Load(std::string path, std::string fileName)
                 for (int i = 0; i < mapData.width; i++) {
                     for (int j = 0; j < mapData.height; j++) {
                         int gid = mapLayer->Get(i, j);
-                        if (gid == 49) {
+                        if (gid == 50) {
                             Vector2D mapCoord = MapToWorld(i, j);
                             PhysBody* c1 = Engine::GetInstance().physics.get()->CreateRectangle(mapCoord.getX()+ mapData.tileWidth/2, mapCoord.getY()+ mapData.tileHeight/2, mapData.tileWidth, mapData.tileHeight, STATIC);
                             c1->ctype = ColliderType::PLATFORM;
