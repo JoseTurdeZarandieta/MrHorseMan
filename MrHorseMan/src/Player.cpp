@@ -82,31 +82,17 @@ bool Player::Update(float dt)
 			anims.SetCurrent("idle");
 
 	// Jump (impulse once)
-<<<<<<< Updated upstream
-	if (Engine::GetInstance().input->GetKey(SDL_SCANCODE_SPACE) == KEY_DOWN && isJumping == false) {
-
-		b2Vec2 vel = physics->GetLinearVelocity(pbody);
-		vel.y = 0.0f;
-		physics->SetLinearVelocity(pbody, vel);
-
-=======
 	if (Engine::GetInstance().input->GetKey(SDL_SCANCODE_SPACE) == KEY_DOWN && jumpCount < maxJumps) {
 		b2Vec2 vel = physics->GetLinearVelocity(pbody); 
 		vel.y = 0;
 		physics->SetLinearVelocity(pbody, vel); 
-		
->>>>>>> Stashed changes
 		physics->ApplyLinearImpulseToCenter(pbody, 0.0f, -jumpForce, true);
 
 		//L10: TODO 6: Update the animation based on the player's state
 		anims.SetCurrent("jump");
 		isJumping = true;
-<<<<<<< Updated upstream
-
-=======
 		isGrounded = false;
 		jumpCount++;
->>>>>>> Stashed changes
 	}
 
 	// Preserve vertical speed while jumping
