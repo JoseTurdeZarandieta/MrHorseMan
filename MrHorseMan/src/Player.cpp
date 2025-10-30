@@ -77,7 +77,7 @@ bool Player::Update(float dt)
 
 	// Jump (impulse once)
 	if (Engine::GetInstance().input->GetKey(SDL_SCANCODE_SPACE) == KEY_DOWN && isJumping == false) {
-		physics->ApplyLinearImpulseToCenter(pbody, 0.0f, -jumpForce +0.5, true);
+		physics->ApplyLinearImpulseToCenter(pbody, 0.0f, -jumpForce, true);
 		//L10: TODO 6: Update the animation based on the player's state
 		anims.SetCurrent("jump");
 		isJumping = true;
