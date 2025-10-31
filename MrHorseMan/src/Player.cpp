@@ -149,13 +149,14 @@ void Player::OnCollision(PhysBody* physA, PhysBody* physB) {
 	switch (physB->ctype)
 	{
 	case ColliderType::PLATFORM:
-		LOG("Collision PLATFORM");
+		//LOG("Collision PLATFORM");
 		if (isJumping) {
 			if (maxDownwardSpeed > fallSpeedDamageThreshold) {
 				float t = (std::min(maxDownwardSpeed, fallSpeedMax) - fallSpeedDamageThreshold) / std::max(0.001f, (fallSpeedMax - fallSpeedDamageThreshold));
 				int dmg = (int)(t * 60.0f);
 				TakeDamage(dmg);
 			}
+			LOG("jump x platform");
 			maxDownwardSpeed = 0.0f;
 		}
 		//reset the jump flag when touching the ground
@@ -183,7 +184,7 @@ void Player::OnCollisionEnd(PhysBody* physA, PhysBody* physB)
 	switch (physB->ctype)
 	{
 	case ColliderType::PLATFORM:
-		LOG("End Collision PLATFORM");
+		//LOG("End Collision PLATFORM");
 		isJumping = true;
 		break;
 	case ColliderType::ITEM:
