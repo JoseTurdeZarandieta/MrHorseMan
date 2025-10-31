@@ -120,7 +120,7 @@ if (position.getX() - limitLeft > 0 && position.getX() < limitRight) {
 }
 
 // L10: TODO 5: Draw the player using the texture and the current animation frame
-Engine::GetInstance().render->DrawTexture(texture, x - texW / 2, y - 1.7 * texH, &animFrame, 1.0f, 0.0, INT_MAX, INT_MAX, flip);
+Engine::GetInstance().render->DrawTexture(texture, x - texW / 2, y - 1.5* texH, &animFrame, 1.0f, 0.0, INT_MAX, INT_MAX, flip);
 
 //health screen display
 char hpText[32];
