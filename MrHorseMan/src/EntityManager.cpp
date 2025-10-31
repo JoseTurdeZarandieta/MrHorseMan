@@ -5,6 +5,7 @@
 #include "Scene.h"
 #include "Log.h"
 #include "Item.h"
+#include "Enemy.h"
 
 EntityManager::EntityManager() : Module()
 {
@@ -94,6 +95,15 @@ void EntityManager::AddEntity(std::shared_ptr<Entity> entity)
 {
 	if ( entity != nullptr) entities.push_back(entity);
 }
+
+void EntityManager::resetEnemiesToSpwan() {
+	for (auto& entity : entities) {
+		if (entity->type == EntityType::ENEMY)
+			static_cast<Enemy*>(entity.get())->ResetToSpawn();
+	}
+}
+
+
 
 bool EntityManager::Update(float dt)
 {

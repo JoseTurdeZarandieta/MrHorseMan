@@ -72,6 +72,10 @@ bool Render::Start()
 	{
 		LOG("SDL_GetRenderViewport failed: %s", SDL_GetError());
 	}
+	InitTTF("Assets/Fonts/DejaVuSans.ttf", 18);
+	if (!InitTTF("Assets/Fonts/DejaVuSans.ttf", 18)) {
+		LOG("InitTTF failed: %s", SDL_GetError());
+	}
 	return true;
 }
 
@@ -284,4 +288,33 @@ void Render::SetVSync(bool enabled) {
 	if (SDL_SetRenderVSync(renderer, enabled ? 1 : 0) != 0) {
 		LOG("SDL_SetRenderVSync failed: %s", SDL_GetError());
 	}
+}
+
+bool Render::InitTTF(const char* fontPath, int ptSize) {
+	if (TTF_Init() != 0) {
+		LOG("TTF_Init failed %s", SDL_GetError());
+		return false;
+	}
+	uiFont = TTF_OpenFont(fontPath, ptSize);
+	if (!uiFont) {
+		LOG("TTF_OpenFont failed: %s", SDL_GetError()); //TTF_GetError works on sdl2, obsolete on sdl3
+		return false;
+	}
+	return true;
+}
+
+bool Render::DrawText(const char* text, int x, int y) {
+	if (!uiFont) return false;
+	SDL_Color white = { 255, 255, 255, 255 };
+	SDL_Surface* surf = TTF_RenderText_Blended(uiFont, text, SDL_strlen(text), white);
+	if (!surf) return false;
+	SDL_Texture* tex = SDL_CreateTextureFromSurface(renderer, surf);
+	if (!tex) return false;
+
+	float width = 0, height = 0;
+	SDL_GetTextureSize(tex, &width, &height);
+	SDL_FRect dst{ (float)x, (float)y, width, height };
+	bool worksOk = SDL_RenderTexture(renderer, tex, nullptr, &dst);
+	SDL_DestroyTexture(tex);
+	return worksOk;
 }
