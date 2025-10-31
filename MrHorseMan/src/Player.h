@@ -67,4 +67,7 @@ private:
 	SDL_FlipMode flip = SDL_FLIP_NONE;
 
 	float maxDownwardSpeed = 0.0f;
+	bool isGrounded = false;
+	int jumpCount = 0;
+	const int maxJumps = 2; // 1 ground + 1 air (double jump)
 };

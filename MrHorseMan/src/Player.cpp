@@ -63,6 +63,7 @@ bool Player::Update(float dt)
 	// Read current velocity
 	b2Vec2 velocity = physics->GetLinearVelocity(pbody);
 	velocity = { 0, velocity.y }; // Reset horizontal velocity
+	bool moving = false;
 
 	// Move left/right
 	if (Engine::GetInstance().input->GetKey(SDL_SCANCODE_A) == KEY_REPEAT) {
@@ -70,20 +71,31 @@ bool Player::Update(float dt)
 		//L10: TODO 6: Update the animation based on the player's state
 		anims.SetCurrent("move");
 		flip = SDL_FLIP_HORIZONTAL; //flips the player's character when moving left
+		moving = true;
 	}
-	if (Engine::GetInstance().input->GetKey(SDL_SCANCODE_D) == KEY_REPEAT) {
+	else if (Engine::GetInstance().input->GetKey(SDL_SCANCODE_D) == KEY_REPEAT) {
 		velocity.x = speed;
 		//L10: TODO 6: Update the animation based on the player's state
 		anims.SetCurrent("move");
 		flip = SDL_FLIP_NONE;
+		moving = true;
 	}
+	else
+		if (isGrounded)
+			anims.SetCurrent("idle");
 
 	// Jump (impulse once)
-	if (Engine::GetInstance().input->GetKey(SDL_SCANCODE_SPACE) == KEY_DOWN && isJumping == false) {
+	if (Engine::GetInstance().input->GetKey(SDL_SCANCODE_SPACE) == KEY_DOWN && jumpCount < maxJumps) {
+		b2Vec2 vel = physics->GetLinearVelocity(pbody); 
+		vel.y = 0;
+		physics->SetLinearVelocity(pbody, vel); 
 		physics->ApplyLinearImpulseToCenter(pbody, 0.0f, -jumpForce, true);
+
 		//L10: TODO 6: Update the animation based on the player's state
 		anims.SetCurrent("jump");
 		isJumping = true;
+		isGrounded = false;
+		jumpCount++;
 	}
 
 // Preserve vertical speed while jumping
@@ -149,6 +161,22 @@ void Player::OnCollision(PhysBody* physA, PhysBody* physB) {
 	switch (physB->ctype)
 	{
 	case ColliderType::PLATFORM:
+	{
+		int px, py;
+		int bx, by;
+		pbody->GetPosition(px, py);
+		physB->GetPosition(bx, by);
+
+		// Compute vertical and horizontal distance
+		float dy = py - by;
+		float dx = abs(px - bx);
+
+		// Only count as landing if the platform is below the player and horizontally aligned
+		if (dy < -texH / 2 && dx < texW) // platform below within tolerance
+		{
+			jumpCount = 0;
+			anims.SetCurrent("idle");
+		}
 		//LOG("Collision PLATFORM");
 		if (isJumping) {
 			if (maxDownwardSpeed > fallSpeedDamageThreshold) {
@@ -161,9 +189,11 @@ void Player::OnCollision(PhysBody* physA, PhysBody* physB) {
 		}
 		//reset the jump flag when touching the ground
 		isJumping = false;
+		isGrounded = true;
 		//L10: TODO 6: Update the animation based on the player's state
-		anims.SetCurrent("idle");
+		LOG("Collision PLATFORM");
 		break;
+	}
 	case ColliderType::ITEM:
 		LOG("Collision ITEM");
 		Engine::GetInstance().audio->PlayFx(pickCoinFxId);
@@ -184,8 +214,7 @@ void Player::OnCollisionEnd(PhysBody* physA, PhysBody* physB)
 	switch (physB->ctype)
 	{
 	case ColliderType::PLATFORM:
-		//LOG("End Collision PLATFORM");
-		isJumping = true;
+		LOG("End Collision PLATFORM");
 		break;
 	case ColliderType::ITEM:
 		LOG("End Collision ITEM");
