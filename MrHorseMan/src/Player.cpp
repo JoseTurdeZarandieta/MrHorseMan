@@ -131,6 +131,13 @@ if (position.getX() - limitLeft > 0 && position.getX() < limitRight) {
 
 }
 
+float limitUp = Engine::GetInstance().render->camera.h / 4;
+float limitDown = Engine::GetInstance().map->GetMapSizeInPixels().getY() - Engine::GetInstance().render->camera.h * 3 / 4;
+if (position.getY() - limitUp > 0 && position.getY() < limitDown) {
+	Engine::GetInstance().render->camera.y = -position.getY() + Engine::GetInstance().render->camera.h / 4;
+
+}
+
 // L10: TODO 5: Draw the player using the texture and the current animation frame
 Engine::GetInstance().render->DrawTexture(texture, x - texW / 2, y - 1.5* texH, &animFrame, 1.0f, 0.0, INT_MAX, INT_MAX, flip);
 
