@@ -68,6 +68,7 @@ private:
 
 	float maxDownwardSpeed = 0.0f;
 	bool isGrounded = false;
+	bool dashed = false;
 	int jumpCount = 0;
 	const int maxJumps = 2; // 1 ground + 1 air (double jump)
 };

@@ -84,6 +84,17 @@ bool Player::Update(float dt)
 		if (isGrounded)
 			anims.SetCurrent("idle");
 
+	//Dash															
+	if (Engine::GetInstance().input->GetKey(SDL_SCANCODE_S) == KEY_DOWN && dashed == false && (isJumping == true || isGrounded == true)) {
+			velocity.x = speed*20;
+			velocity.y = 0;
+			physics->ApplyLinearImpulseToCenter(pbody, 0.0f, 0, true);
+		
+		dashed == true;
+		isJumping == true;
+
+	}
+
 	// Jump (impulse once)
 	if (Engine::GetInstance().input->GetKey(SDL_SCANCODE_SPACE) == KEY_DOWN && jumpCount < maxJumps) {
 		b2Vec2 vel = physics->GetLinearVelocity(pbody); 
@@ -97,6 +108,7 @@ bool Player::Update(float dt)
 		isGrounded = false;
 		jumpCount++;
 	}
+
 
 // Preserve vertical speed while jumping
 if (isJumping == true) {
