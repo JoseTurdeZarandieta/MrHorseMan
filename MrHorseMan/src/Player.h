@@ -67,6 +67,7 @@ private:
 
 	float maxDownwardSpeed = 0.0f;
 	bool isGrounded = false;
+	bool godMode = false;
 	bool dashed = false;
 	int jumpCount = 0;
 	int isRight = 1;
@@ -74,6 +75,7 @@ private:
 	float maxTime = 1.0f;
 	float deltaTime = 0.0f;
 	float lastTime = 0.0f;
+	
 
 	const int maxJumps = 2; // 1 ground + 1 air (double jump)
 };
