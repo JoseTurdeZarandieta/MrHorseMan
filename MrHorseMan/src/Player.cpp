@@ -30,30 +30,23 @@ bool Player::Awake() {
 
 bool Player::Start() {
 
-	float currentTime = SDL_GetTicks() / 1000.0f; // en segundos
-	deltaTime = currentTime - lastTime;
-	lastTime = currentTime;
-	//L03: TODO 2: Initialize Player parameters
-	//L10: TODO 3; Load the spritesheet of the player
+	spawnPos = position;
+
 	texture = Engine::GetInstance().textures->Load("Assets/Textures/MrHorseMan_spritesheet.png");
 
-	//L10: TODO 3: Load the spritesheet animations from the TSX file
 	std::unordered_map<int, std::string> animNames = { {0, "idle"}, {6, "move"}, {12, "jump"} };
 	anims.LoadFromTSX("Assets/Textures/MrHorseMan_spritesheet.tsx", animNames);
 	anims.SetCurrent("idle");
-	// L08 TODO 5: Add physics to the player - initialize physics body
+
 	texW = 32;
 	texH = 32;
 	pbody = Engine::GetInstance().physics->CreateCircle((int)position.getX(), (int)position.getY(), texH / 2, bodyType::DYNAMIC);
 
-	// L08 TODO 6: Assign player class (using "this") to the listener of the pbody. This makes the Physics module to call the OnCollision method
 	pbody->listener = this;
 
-	// L08 TODO 7: Assign collider type
 	pbody->ctype = ColliderType::PLAYER;
 	//Engine::GetInstance().physics->SetTransform(pbody, spawnPos.getX(), spawnPos.getY());
 
-	//initialize audio effect
 	pickCoinFxId = Engine::GetInstance().audio->LoadFx("Assets/Audio/Fx/coin-collision-sound-342335.wav");
 
 	return true;
@@ -213,12 +206,13 @@ void Player::OnCollision(PhysBody* physA, PhysBody* physB) {
 		}
 		//LOG("Collision PLATFORM");
 		if (isJumping) {
+			int dmg = 0;
 			if (maxDownwardSpeed > fallSpeedDamageThreshold) {
-				float t = (std::min(maxDownwardSpeed, fallSpeedMax) - fallSpeedDamageThreshold) / std::max(0.001f, (fallSpeedMax - fallSpeedDamageThreshold));
-				int dmg = (int)(t * 60.0f);
+				float t = (std::min(maxDownwardSpeed, fallSpeedMax) - fallSpeedDamageThreshold) / std::max(0.07f, (fallSpeedMax - fallSpeedDamageThreshold));
+				dmg = (int)(t * 120.0f);
 				TakeDamage(dmg);
 			}
-			LOG("jump x platform");
+			LOG("jump x platform. dmg %d", dmg);
 			maxDownwardSpeed = 0.0f;
 		}
 		//reset the jump flag when touching the ground
@@ -231,7 +225,10 @@ void Player::OnCollision(PhysBody* physA, PhysBody* physB) {
 	case ColliderType::ITEM:
 		LOG("Collision ITEM");
 		Engine::GetInstance().audio->PlayFx(pickCoinFxId);
-		physB->listener->Destroy();
+
+		if (physB && physB->listener) {
+			physB->listener->Destroy();
+		}
 		break;
 	case ColliderType::ENEMY:
 		TakeDamage(10);

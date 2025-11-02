@@ -179,6 +179,49 @@ bool Map::Load(std::string path, std::string fileName)
             mapData.layers.push_back(mapLayer);
         }
 
+        //spawning
+
+        for (pugi::xml_node og = mapFileXML.child("map").child("objectgroup"); og; og = og.next_sibling("objectgroup"))
+        {
+            std::string layerName = og.attribute("name").as_string();
+            std::vector<TiledObject> list;
+
+            for (pugi::xml_node obj = og.child("object"); obj; obj = obj.next_sibling("object"))
+            {
+                TiledObject to;
+                to.name = obj.attribute("name").as_string();
+              /* type (or) class to spawn enything was giving errors */
+                const char* rawType = obj.attribute("type").as_string(); 
+                if (rawType == nullptr || *rawType == '\0')
+                    rawType = obj.attribute("class").as_string(); //depending on Tiled version, class = type. can't seem to be able to write class on map.h as it expects there to be smth else
+                to.type = rawType ? rawType : "";
+
+                to.x = obj.attribute("x").as_float();
+                to.y = obj.attribute("y").as_float();
+
+                pugi::xml_node props = obj.child("properties");
+                if (props)
+                {
+                    for (pugi::xml_node p = props.child("property"); p; p = p.next_sibling("property"))
+                    {
+                        std::string key = p.attribute("name").as_string();
+                        std::string val = p.attribute("value").as_string();
+                        if (val.empty() && p.child_value() && *p.child_value())
+                            val = p.child_value();
+                        to.properties.emplace(std::move(key), std::move(val));
+                    }
+                }
+                list.push_back(std::move(to));
+            }
+
+            if (!list.empty()) {
+                objectLayers_[layerName] = std::move(list);
+                LOG("Spawns loaded: %zu objects from layer '%s'", objectLayers_[layerName].size(), layerName.c_str());
+            }
+
+        }
+
+
         // L08 TODO 3: Create colliders
         // L08 TODO 7: Assign collider type
         // Later you can create a function here to load and create the colliders from the map
@@ -233,6 +276,12 @@ bool Map::Load(std::string path, std::string fileName)
 
     mapLoaded = ret;
     return ret;
+}
+
+std::vector<TiledObject> Map::GetObjects(const std::string& layerName) const {
+    auto it = objectLayers_.find(layerName);
+    if (it != objectLayers_.end()) return it->second;
+    return{};
 }
 
 // L07: TODO 8: Create a method that translates x,y coordinates from map positions to world positions

@@ -13,7 +13,7 @@
 Physics::Physics() : Module()
 {
     world = b2_nullWorldId;
-    debug = true; // toggle with F1
+    debug = false; // toggle with F9
 }
 
 // Destructor
@@ -185,8 +185,13 @@ bool Physics::PostUpdate()
     bool ret = true;
 
     // Activate or deactivate debug mode
-    if (Engine::GetInstance().input.get()->GetKey(SDL_SCANCODE_F1) == KEY_DOWN)
-        debug = !debug;
+
+    if (Engine::GetInstance().input.get()->GetKey(SDL_SCANCODE_F9) == KEY_DOWN) {
+        if (!debug)
+            debug = true;
+        else if (debug)
+            debug = !debug;
+    }
 
     // Debug draw via Box2D 3.x callbacks
     if (debug)
@@ -222,6 +227,7 @@ bool Physics::PostUpdate()
     // Process bodies to delete after the world step
     for (PhysBody* physBody : bodiesToDelete) {
         b2DestroyBody(physBody->body);
+        delete physBody;
     }
     bodiesToDelete.clear();
 
@@ -254,8 +260,13 @@ void Physics::BeginContact(b2ShapeId shapeA, b2ShapeId shapeB)
     PhysBody* physB = BodyToPhys(bodyB);
     if (!physA || !physB) return;                  // user data cleared
 
-    if (physA->listener && !IsPendingToDelete(physA)) physA->listener->OnCollision(physA, physB);
-    if (physB->listener && !IsPendingToDelete(physB)) physB->listener->OnCollision(physB, physA);
+   /* if (physA->listener && !IsPendingToDelete(physA)) physA->listener->OnCollision(physA, physB);
+    if   (physB->listener && !IsPendingToDelete(physB))   physB->listener->OnCollision(physB, physA);*/
+
+    if (IsPendingToDelete(physA) || IsPendingToDelete(physB)) return;
+    
+    if (physA->listener)    physA->listener->OnCollision(physA, physB);
+    if (physB->listener)    physB->listener->OnCollision(physB, physA);
 }
 
 void Physics::EndContact(b2ShapeId shapeA, b2ShapeId shapeB)
@@ -271,8 +282,8 @@ void Physics::EndContact(b2ShapeId shapeA, b2ShapeId shapeB)
     if (!physA || !physB) return;
     if (IsPendingToDelete(physA) || IsPendingToDelete(physB)) return;
 
-    if (physA->listener && !IsPendingToDelete(physA)) physA->listener->OnCollisionEnd(physA, physB);
-    if (physB->listener && !IsPendingToDelete(physB)) physB->listener->OnCollisionEnd(physB, physA);
+    if (physA->listener /*&& !IsPendingToDelete(physA)*/) physA->listener->OnCollisionEnd(physA, physB);
+    if (physB->listener /*&& !IsPendingToDelete(physB)*/) physB->listener->OnCollisionEnd(physB, physA);
 }
 
 
@@ -280,12 +291,13 @@ void Physics::EndContact(b2ShapeId shapeA, b2ShapeId shapeB)
 void Physics::DeletePhysBody(PhysBody* physBody)
 {
 	if (B2_IS_NULL(world)) return; // world already destroyed
-    if (physBody && !B2_IS_NULL(physBody->body) && physBody->listener->active)
+    if (physBody && !B2_IS_NULL(physBody->body) /*&& physBody->listener->active*/)
     {
         // Don’t change contact/sensor flags here (can mismatch event buffers).
         // Just clear user data so late events won’t dereference a dangling PhysBody*.
         b2Body_SetUserData(physBody->body, nullptr);
     }
+    if (physBody) physBody->listener = nullptr;
     bodiesToDelete.push_back(physBody);
 }
 
