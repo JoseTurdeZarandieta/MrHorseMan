@@ -240,7 +240,7 @@ void Player::OnCollision(PhysBody* physA, PhysBody* physB) {
 		LOG("Collision Enemy");
 		break;
 	case ColliderType::DEATHZONE:
-
+		break;
 	case ColliderType::UNKNOWN:
 		LOG("Collision UNKNOWN");
 		break;
