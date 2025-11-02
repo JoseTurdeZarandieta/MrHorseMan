@@ -43,6 +43,8 @@ private:
 
 	PhysBody* pbody = nullptr;
 	Vector2D spawn;
+
+	/*TODO: enemy patrols*/
 	float patrolLeft = 0.0f;
 	float patrolRight = 0.0f;
 	int direction = 1; //1 right, -1 left

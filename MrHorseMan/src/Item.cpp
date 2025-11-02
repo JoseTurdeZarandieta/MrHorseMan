@@ -56,7 +56,12 @@ bool Item::Update(float dt)
 bool Item::CleanUp()
 {
 	Engine::GetInstance().textures->UnLoad(texture);
+	if (pbody) {
+		pbody->listener = nullptr;
+	}
 	Engine::GetInstance().physics->DeletePhysBody(pbody);
+	pbody = nullptr;
+
 	return true;
 }
 

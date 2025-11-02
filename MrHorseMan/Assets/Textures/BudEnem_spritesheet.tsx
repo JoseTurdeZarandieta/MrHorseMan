@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<tileset version="1.10" tiledversion="1.11.0" name="BudEnem" tilewidth="32" tileheight="32" tilecount="4" columns="4">
- <image source="BudEnem.png" width="128" height="32"/>
+<tileset version="1.10" tiledversion="1.11.0" name="BudEnem_spritesheet" tilewidth="32" tileheight="32" tilecount="4" columns="4">
+ <image source="BudEnem_spritesheet.png" width="128" height="32"/>
  <tile id="0">
   <animation>
    <frame tileid="0" duration="100"/>
