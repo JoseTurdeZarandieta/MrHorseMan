@@ -181,25 +181,27 @@ bool Map::Load(std::string path, std::string fileName)
 
         //spawning
 
-        for (pugi::xml_node og = mapFileXML.child("map").child("objectgroup"); og; og = og.next_sibling("objectgroup"))
+        for (pugi::xml_node objectNode = mapFileXML.child("map").child("objectgroup"); objectNode; objectNode = objectNode.next_sibling("objectgroup"))
         {
-            std::string layerName = og.attribute("name").as_string();
+            std::string layerName = objectNode.attribute("name").as_string();
             std::vector<TiledObject> list;
 
-            for (pugi::xml_node obj = og.child("object"); obj; obj = obj.next_sibling("object"))
+            for (pugi::xml_node object = objectNode.child("object"); object; object = object.next_sibling("object"))
             {
                 TiledObject to;
-                to.name = obj.attribute("name").as_string();
+                to.name = object.attribute("name").as_string();
               /* type (or) class to spawn enything was giving errors */
-                const char* rawType = obj.attribute("type").as_string(); 
+                const char* rawType = object.attribute("type").as_string();
                 if (rawType == nullptr || *rawType == '\0')
-                    rawType = obj.attribute("class").as_string(); //depending on Tiled version, class = type. can't seem to be able to write class on map.h as it expects there to be smth else
+                    rawType = object.attribute("class").as_string(); //depending on Tiled version, class = type. can't seem to be able to write class on map.h as it expects there to be smth else
                 to.type = rawType ? rawType : "";
 
-                to.x = obj.attribute("x").as_float();
-                to.y = obj.attribute("y").as_float();
+                to.x = object.attribute("x").as_float();
+                to.y = object.attribute("y").as_float();
+                to.width = object.attribute("width").as_float();
+                to.height = object.attribute("height").as_float();
 
-                pugi::xml_node props = obj.child("properties");
+                pugi::xml_node props = object.child("properties");
                 if (props)
                 {
                     for (pugi::xml_node p = props.child("property"); p; p = p.next_sibling("property"))
@@ -218,7 +220,16 @@ bool Map::Load(std::string path, std::string fileName)
                 objectLayers_[layerName] = std::move(list);
                 LOG("Spawns loaded: %zu objects from layer '%s'", objectLayers_[layerName].size(), layerName.c_str());
             }
+            auto dz = objectLayers_.find("DeathZones");
+            if (dz != objectLayers_.end()) {
+                for (const auto& origin : dz->second) {
+                    float centerx = origin.x + origin.width * 0.5f;
+                    float centery = origin.y + origin.height * 0.5f;
 
+                    PhysBody* pbody = Engine::GetInstance().physics->CreateRectangleSensor(centerx, centery, origin.width, origin.height, STATIC);
+                    pbody->ctype = ColliderType::DEATHZONE;
+                }
+            }
         }
 
 

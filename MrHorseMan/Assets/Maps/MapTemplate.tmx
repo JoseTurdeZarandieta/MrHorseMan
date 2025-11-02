@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.0" orientation="orthogonal" renderorder="right-down" width="88" height="59" tilewidth="32" tileheight="32" infinite="0" nextlayerid="15" nextobjectid="17">
+<map version="1.10" tiledversion="1.11.0" orientation="orthogonal" renderorder="right-down" width="88" height="59" tilewidth="32" tileheight="32" infinite="0" nextlayerid="16" nextobjectid="54">
  <properties>
   <property name="Draw" type="bool" value="true"/>
  </properties>
@@ -26120,6 +26120,46 @@
     <property name="type" value="enemy"/>
    </properties>
    <point/>
+  </object>
+ </objectgroup>
+ <objectgroup id="15" name="DeathZones">
+  <object id="19" x="0" y="0" width="288" height="32"/>
+  <object id="20" x="2048" y="32" width="64" height="32"/>
+  <object id="21" x="2560" y="32" width="128" height="32"/>
+  <object id="23" x="2144" y="448" width="32" height="250.667"/>
+  <object id="24" x="2528" y="448" width="32" height="160"/>
+  <object id="25" x="2528" y="640" width="32" height="160"/>
+  <object id="26" x="2528" y="832" width="32" height="160"/>
+  <object id="27" x="2144" y="736" width="32" height="160"/>
+  <object id="28" x="2144" y="928" width="32" height="160"/>
+  <object id="29" x="2528" y="1024" width="32" height="160"/>
+  <object id="30" x="2208" y="960" width="96" height="32"/>
+  <object id="31" x="2208" y="768" width="96" height="32"/>
+  <object id="32" x="2400" y="864" width="96" height="32"/>
+  <object id="33" x="2400" y="672" width="96" height="32"/>
+  <object id="34" x="2400" y="1056" width="96" height="32"/>
+  <object id="35" x="2208" y="1152" width="96" height="32"/>
+  <object id="36" x="2400" y="1248" width="96" height="32"/>
+  <object id="37" x="2112" y="1248" width="32" height="32"/>
+  <object id="38" x="1984" y="1184" width="64" height="32"/>
+  <object id="39" x="1888" y="1248" width="32" height="32"/>
+  <object id="40" x="256" y="1280" width="320" height="64"/>
+  <object id="41" x="640" y="1280" width="1184" height="64"/>
+  <object id="42" x="896" y="1152" width="128" height="32"/>
+  <object id="43" x="864" y="960" width="128" height="32"/>
+  <object id="44" x="704" y="832" width="128" height="32"/>
+  <object id="45" x="448" y="832" width="128" height="32"/>
+  <object id="46" x="320" y="704" width="128" height="32"/>
+  <object id="47" x="576" y="672" width="128" height="32"/>
+  <object id="48" x="928" y="640" width="128" height="32"/>
+  <object id="49" x="1216" y="736" width="32" height="288"/>
+  <object id="50" x="1376" y="896" width="128" height="32"/>
+  <object id="51" x="1376" y="640" width="96" height="32"/>
+  <object id="52" x="1472" y="448" width="32" height="192"/>
+  <object id="53" x="1568" y="544" width="32" height="96">
+   <properties>
+    <property name="Draw" type="bool" value="false"/>
+   </properties>
   </object>
  </objectgroup>
  <layer id="5" name="Collisions" width="88" height="59">

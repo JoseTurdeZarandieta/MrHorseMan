@@ -497,8 +497,11 @@ void Physics::SetTransform(PhysBody* body, float x, float y) {
 
     b2Body_SetLinearVelocity(id, zero); //sets velocity @ 0
 
+    /*b2Transform xf = b2Body_GetTransform(id);
+    b2Vec2 newPos{ x,y };*/
+
+    b2Vec2 newPos{ PIXEL_TO_METERS(x), PIXEL_TO_METERS(y) };
     b2Transform xf = b2Body_GetTransform(id);
-    b2Vec2 newPos{ x,y };
 
     b2Body_SetTransform(id, newPos, xf.q);
     b2Body_SetAwake(id, true);

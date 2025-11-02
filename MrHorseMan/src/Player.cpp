@@ -56,6 +56,13 @@ bool Player::Update(float dt)
 {
 	Physics* physics = Engine::GetInstance().physics.get();
 
+	if (pendingRespawn) {
+		pendingRespawn = false;
+		Respawn();
+	}
+
+
+
 	// Read current velocity
 	b2Vec2 velocity = physics->GetLinearVelocity(pbody);
 	if(!dashed)velocity = { 0, velocity.y }; // Reset horizontal velocity
@@ -160,16 +167,16 @@ if (position.getY() - limitUp > 0 && position.getY() < limitDown) {
 // L10: TODO 5: Draw the player using the texture and the current animation frame
 Engine::GetInstance().render->DrawTexture(texture, x - texW / 2, y - 1.5* texH, &animFrame, 1.0f, 0.0, INT_MAX, INT_MAX, flip);
 
-//health screen display
-char hpText[32];
-snprintf(hpText, sizeof(hpText), "HP: %d", health);
-
-int screenW = Engine::GetInstance().render->camera.w;
-int margin = 12;
-int posTextX = -Engine::GetInstance().render->camera.w + (screenW - 100);
-int posTextY = Engine::GetInstance().render->camera.y + margin;
-
-Engine::GetInstance().render->DrawText(hpText, posTextX, posTextY);
+//health screen display TODO NEXT TIME. THIS TIME, NO UI REQUIRED
+//char hpText[32];A
+//snprintf(hpText, sizeof(hpText), "HP: %d", health);
+//
+//int screenW = Engine::GetInstance().render->camera.w;
+//int margin = 12;
+//int posTextX = -Engine::GetInstance().render->camera.w + (screenW - 100);
+//int posTextY = Engine::GetInstance().render->camera.y + margin;
+//
+//Engine::GetInstance().render->DrawText(hpText, posTextX, posTextY);
 
 
 return true;
@@ -212,7 +219,7 @@ void Player::OnCollision(PhysBody* physA, PhysBody* physB) {
 				dmg = (int)(t * 120.0f);
 				TakeDamage(dmg);
 			}
-			LOG("jump x platform. dmg %d", dmg);
+			LOG("jump x platform. dmg %d\Current Health %d", dmg, health);
 			maxDownwardSpeed = 0.0f;
 		}
 		//reset the jump flag when touching the ground
@@ -237,9 +244,11 @@ void Player::OnCollision(PhysBody* physA, PhysBody* physB) {
 		break;
 	case ColliderType::ENEMY:
 		TakeDamage(10);
-		LOG("Collision Enemy");
+		LOG("Collision Enemy. Health %d", health);
 		break;
 	case ColliderType::DEATHZONE:
+		LOG("DeathZone hit. Respawning");
+		pendingRespawn = true;
 		break;
 	case ColliderType::UNKNOWN:
 		LOG("Collision UNKNOWN");
@@ -261,6 +270,9 @@ void Player::OnCollisionEnd(PhysBody* physA, PhysBody* physB)
 		break;
 	case ColliderType::ENEMY:
 		LOG("End Collision ENEMY");
+		break;
+	case ColliderType::DEATHZONE:
+		LOG("End Collision DEATHZONE");
 		break;
 	case ColliderType::UNKNOWN:
 		LOG("End Collision UNKNOWN");
@@ -291,8 +303,15 @@ void Player::Respawn() {
 	physics->SetLinearVelocity(pbody, { 0,0 });
 	physics->SetTransform(pbody, spawnPos.getX(), spawnPos.getY());
 
+	position = spawnPos;
 	isJumping = false;
+	isGrounded = false;
+	jumpCount = 0;
+	maxDownwardSpeed = 0.0f;
 	anims.SetCurrent("idle");
-
+	
+	Engine::GetInstance().render->camera.x = position.getX();
+	Engine::GetInstance().render->camera.y = position.getY();
 	Engine::GetInstance().entityManager->resetEnemiesToSpwan();
+	LOG("Player respawned at (%.1f, %.1f)", spawnPos.getX(), spawnPos.getY());
 }
