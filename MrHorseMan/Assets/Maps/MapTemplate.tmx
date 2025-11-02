@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.0" orientation="orthogonal" renderorder="right-down" width="88" height="59" tilewidth="32" tileheight="32" infinite="0" nextlayerid="15" nextobjectid="13">
+<map version="1.10" tiledversion="1.11.0" orientation="orthogonal" renderorder="right-down" width="88" height="59" tilewidth="32" tileheight="32" infinite="0" nextlayerid="15" nextobjectid="17">
  <properties>
   <property name="Draw" type="bool" value="true"/>
  </properties>
@@ -26073,27 +26073,51 @@
    </properties>
    <point/>
   </object>
-  <object id="9" name="EnemySpawn" x="376.667" y="594.667">
+  <object id="9" name="EnemySpawn" x="1318.67" y="311.334">
    <properties>
     <property name="type" value="enemy"/>
    </properties>
    <point/>
   </object>
-  <object id="10" name="ItemSpawn" x="383.333" y="209.333">
+  <object id="10" name="ItemSpawn" x="383.333" y="629.333">
    <properties>
     <property name="type" value="item"/>
    </properties>
    <point/>
   </object>
-  <object id="11" name="EnemySpawn" x="667.334" y="589.333">
+  <object id="11" name="EnemySpawn" x="503.092" y="138.303">
    <properties>
     <property name="type" value="enemy"/>
    </properties>
    <point/>
   </object>
-  <object id="12" name="ItemSpawn" x="672" y="204">
+  <object id="12" name="ItemSpawn" x="1304" y="170">
    <properties>
     <property name="type" value="item"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="13" name="ItemSpawn" x="948.485" y="881.818">
+   <properties>
+    <property name="type" value="item"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="14" name="ItemSpawn" x="1960.61" y="624.242">
+   <properties>
+    <property name="type" value="item"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="15" name="ItemSpawn" x="2018.18" y="1272.73">
+   <properties>
+    <property name="type" value="item"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="16" name="EnemySpawn" x="463.636" y="1103.03">
+   <properties>
+    <property name="type" value="enemy"/>
    </properties>
    <point/>
   </object>

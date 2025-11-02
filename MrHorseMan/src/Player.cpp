@@ -23,7 +23,7 @@ Player::~Player() {
 bool Player::Awake() {
 
 	//L03: TODO 2: Initialize Player parameters
-	position = Vector2D(96, 96);
+	//position = Vector2D(96, 96);
 	spawnPos = position;
 	health = maxHealth;
 	return true;
@@ -46,7 +46,6 @@ bool Player::Start() {
 	pbody->listener = this;
 
 	pbody->ctype = ColliderType::PLAYER;
-	//Engine::GetInstance().physics->SetTransform(pbody, spawnPos.getX(), spawnPos.getY());
 
 	pickCoinFxId = Engine::GetInstance().audio->LoadFx("Assets/Audio/Fx/coin-collision-sound-342335.wav");
 
@@ -77,9 +76,6 @@ bool Player::Update(float dt)
 		flip = SDL_FLIP_NONE;
 		moving = true;
 	}
-	else
-		if (isGrounded)
-			anims.SetCurrent("idle");
 
 	// Jump (impulse once)
 	if (Engine::GetInstance().input->GetKey(SDL_SCANCODE_SPACE) == KEY_DOWN && jumpCount < maxJumps) {
@@ -94,6 +90,8 @@ bool Player::Update(float dt)
 		isGrounded = false;
 		jumpCount++;
 	}
+	if (!isJumping && !moving)
+		anims.SetCurrent("idle");
 
 // Preserve vertical speed while jumping
 if (isJumping == true) {
@@ -162,8 +160,9 @@ bool Player::CleanUp()
 
 // L08 TODO 6: Define OnCollision function for the player. 
 void Player::OnCollision(PhysBody* physA, PhysBody* physB) {
+
 	switch (physB->ctype)
-	{
+	{	
 	case ColliderType::PLATFORM:
 	{
 		int px, py;
@@ -181,7 +180,7 @@ void Player::OnCollision(PhysBody* physA, PhysBody* physB) {
 			jumpCount = 0;
 			anims.SetCurrent("idle");
 		}
-		//LOG("Collision PLATFORM");
+		LOG("Collision PLATFORM");
 		if (isJumping) {
 			int dmg = 0;
 			if (maxDownwardSpeed > fallSpeedDamageThreshold) {

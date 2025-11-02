@@ -35,8 +35,6 @@ public:
 		return health;
 	}
 
-
-
 public:
 
 	//Declare player parameters
@@ -58,7 +56,6 @@ public:
 	Vector2D spawnPos = { 96,96 };
 	float fallSpeedDamageThreshold = 10.0f;
 	float fallSpeedMax = 25.0f;
-
 
 private: 
 	b2Vec2 velocity;
