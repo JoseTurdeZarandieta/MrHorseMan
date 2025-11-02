@@ -34,7 +34,8 @@ bool Scene::Awake()
 
 bool Scene::Start()
 {
-    Engine::GetInstance().audio->PlayMusic("Assets/Audio/Music/level-iv-339695.wav");
+    //Engine::GetInstance().audio->PlayMusic("Assets/Audio/Music/level-iv-339695.wav");
+	Engine::GetInstance().audio->PlayMusic("Assets/Audio/Music/backAgain.wav");
     Engine::GetInstance().map->Load("Assets/Maps/", "MapTemplate.tmx");
 
     auto spawnObjects = Engine::GetInstance().map->GetObjects("Spawns");

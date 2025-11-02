@@ -58,7 +58,7 @@ bool Player::Update(float dt)
 
 	// Read current velocity
 	b2Vec2 velocity = physics->GetLinearVelocity(pbody);
-	velocity = { 0, velocity.y }; // Reset horizontal velocity
+	if(!dashed)velocity = { 0, velocity.y }; // Reset horizontal velocity
 	bool moving = false;
 
 	// Move left/right
@@ -68,6 +68,7 @@ bool Player::Update(float dt)
 		anims.SetCurrent("move");
 		flip = SDL_FLIP_HORIZONTAL; //flips the player's character when moving left
 		moving = true;
+		isRight = -1;
 	}
 	else if (Engine::GetInstance().input->GetKey(SDL_SCANCODE_D) == KEY_REPEAT) {
 		velocity.x = speed;
@@ -75,6 +76,29 @@ bool Player::Update(float dt)
 		anims.SetCurrent("move");
 		flip = SDL_FLIP_NONE;
 		moving = true;
+		isRight = 1;
+	}
+
+	//Dash															
+	if (Engine::GetInstance().input->GetKey(SDL_SCANCODE_S) == KEY_DOWN && dashed == false && (isJumping == true || isGrounded == true)) {
+		LOG("funciona");
+		dashed == true;
+		currentTime = 0.0f;
+
+		b2Body_SetGravityScale(pbody->body, 0.0f); //desactiva gravedad
+		Engine::GetInstance().physics->SetLinearVelocity(pbody, {100.0f * isRight, 0.0f});
+
+		
+	}
+
+	if (dashed == true) {
+		currentTime += deltaTime; // vas contando
+
+		if (currentTime >= maxTime) {
+			dashed = false;
+
+			b2Body_SetGravityScale(pbody->body, 1.0f); //activas gravedad
+		}
 	}
 
 	// Jump (impulse once)
@@ -83,7 +107,6 @@ bool Player::Update(float dt)
 		vel.y = 0;
 		physics->SetLinearVelocity(pbody, vel); 
 		physics->ApplyLinearImpulseToCenter(pbody, 0.0f, -jumpForce, true);
-
 		//L10: TODO 6: Update the animation based on the player's state
 		anims.SetCurrent("jump");
 		isJumping = true;
@@ -92,6 +115,7 @@ bool Player::Update(float dt)
 	}
 	if (!isJumping && !moving)
 		anims.SetCurrent("idle");
+
 
 // Preserve vertical speed while jumping
 if (isJumping == true) {
@@ -214,6 +238,9 @@ void Player::OnCollision(PhysBody* physA, PhysBody* physB) {
 	case ColliderType::ENEMY:
 		TakeDamage(10);
 		LOG("Collision Enemy");
+		break;
+	case ColliderType::DEATHZONE:
+
 	case ColliderType::UNKNOWN:
 		LOG("Collision UNKNOWN");
 		break;
