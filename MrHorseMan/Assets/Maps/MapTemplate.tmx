@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.0" orientation="orthogonal" renderorder="right-down" width="88" height="59" tilewidth="32" tileheight="32" infinite="0" nextlayerid="14" nextobjectid="8">
+<map version="1.10" tiledversion="1.11.0" orientation="orthogonal" renderorder="right-down" width="88" height="59" tilewidth="32" tileheight="32" infinite="0" nextlayerid="15" nextobjectid="13">
  <properties>
   <property name="Draw" type="bool" value="true"/>
  </properties>
@@ -20864,7 +20864,7 @@
    <tile/>
   </data>
  </layer>
- <layer id="12" name="Spawn" width="88" height="59">
+ <layer id="12" name="Spawn" width="88" height="59" visible="0">
   <properties>
    <property name="Draw" type="bool" value="false"/>
   </properties>
@@ -26063,9 +26063,44 @@
    <tile/>
   </data>
  </layer>
- <layer id="5" name="Collisions" width="88" height="59">
+ <objectgroup id="14" name="Spawns">
   <properties>
    <property name="Draw" type="bool" value="true"/>
+  </properties>
+  <object id="8" name="PlayerSpawn" x="64.75" y="206.5">
+   <properties>
+    <property name="type" value="player"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="9" name="enemySpawn" x="222" y="206.667">
+   <properties>
+    <property name="type" value="enemy"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="10" name="ItemSpawn" x="383.333" y="209.333">
+   <properties>
+    <property name="type" value="item"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="11" name="enemySpawn" x="512.667" y="201.333">
+   <properties>
+    <property name="type" value="enemy"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="12" name="ItemSpawn" x="672" y="204">
+   <properties>
+    <property name="type" value="item"/>
+   </properties>
+   <point/>
+  </object>
+ </objectgroup>
+ <layer id="5" name="Collisions" width="88" height="59">
+  <properties>
+   <property name="Draw" type="bool" value="false"/>
   </properties>
   <data>
    <tile gid="49"/>
