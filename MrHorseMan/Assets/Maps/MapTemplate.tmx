@@ -26067,13 +26067,13 @@
   <properties>
    <property name="Draw" type="bool" value="true"/>
   </properties>
-  <object id="8" name="PlayerSpawn" x="64.75" y="206.5">
+  <object id="8" name="PlayerSpawn" x="80.7503" y="201.166">
    <properties>
     <property name="type" value="player"/>
    </properties>
    <point/>
   </object>
-  <object id="9" name="enemySpawn" x="222" y="206.667">
+  <object id="9" name="EnemySpawn" x="376.667" y="594.667">
    <properties>
     <property name="type" value="enemy"/>
    </properties>
@@ -26085,7 +26085,7 @@
    </properties>
    <point/>
   </object>
-  <object id="11" name="enemySpawn" x="512.667" y="201.333">
+  <object id="11" name="EnemySpawn" x="667.334" y="589.333">
    <properties>
     <property name="type" value="enemy"/>
    </properties>

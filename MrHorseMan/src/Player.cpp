@@ -9,6 +9,7 @@
 #include "Physics.h"
 #include "EntityManager.h"
 #include "Map.h"
+#include "Item.h"
 
 Player::Player() : Entity(EntityType::PLAYER)
 {
@@ -203,11 +204,17 @@ void Player::OnCollision(PhysBody* physA, PhysBody* physB) {
 		Engine::GetInstance().audio->PlayFx(pickCoinFxId);
 
 		if (physB && physB->listener) {
+
+			if (auto* item = dynamic_cast<Item*>(physB->listener)) {
+				item->isPicked = true;
+			}
+
 			physB->listener->Destroy();
 		}
 		break;
 	case ColliderType::ENEMY:
 		TakeDamage(10);
+		LOG("Collision Enemy");
 	case ColliderType::UNKNOWN:
 		LOG("Collision UNKNOWN");
 		break;
@@ -225,6 +232,9 @@ void Player::OnCollisionEnd(PhysBody* physA, PhysBody* physB)
 		break;
 	case ColliderType::ITEM:
 		LOG("End Collision ITEM");
+		break;
+	case ColliderType::ENEMY:
+		LOG("End Collision ENEMY");
 		break;
 	case ColliderType::UNKNOWN:
 		LOG("End Collision UNKNOWN");
