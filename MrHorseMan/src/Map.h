@@ -105,6 +105,8 @@ struct TiledObject {
     std::string type;
     float x = 0.0f;
     float y = 0.0f;
+    float width = 0.0f;
+    float height = 0.0f;
     std::unordered_map<std::string, std::string> properties;
 };
 

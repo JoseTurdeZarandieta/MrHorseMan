@@ -35,8 +35,6 @@ public:
 		return health;
 	}
 
-
-
 public:
 
 	//Declare player parameters
@@ -53,12 +51,13 @@ public:
 	float jumpForce = 2.0f; // The force to apply when jumping
 	bool isJumping = false; // Flag to check if the player is currently jumping
 
+	bool pendingRespawn = false;
+
 	int health = 100;
 	int maxHealth = 100;
 	Vector2D spawnPos = { 96,96 };
 	float fallSpeedDamageThreshold = 10.0f;
 	float fallSpeedMax = 25.0f;
-
 
 private: 
 	b2Vec2 velocity;

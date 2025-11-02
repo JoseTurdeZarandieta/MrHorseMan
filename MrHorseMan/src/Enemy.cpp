@@ -8,6 +8,7 @@
 #include "Log.h"
 #include "EntityManager.h"
 #include "Map.h"
+#include "Animation.h"
 
 
 
@@ -21,7 +22,6 @@ Enemy::~Enemy() {
 
 
 bool Enemy::Awake() {
-	position = Vector2D(96, 96);
 	spawnPos = position;
 	health = maxHealth;
 	return true;
@@ -32,12 +32,12 @@ bool Enemy::Start() {
 	spawnPos = position;
 	texture = Engine::GetInstance().textures->Load("Assets/Textures/BudEnem_spritesheet.png");
 
-	std::unordered_map<int, std::string> animNames = { {0, "move"} };
+	std::unordered_map<int, std::string> animNames = { {0, "idle"}/*, {5, "move"} */};
 	anims.LoadFromTSX("Assets/Textures/BudEnem_spritesheet.tsx", animNames);
 	anims.SetCurrent("move");
 
-	texW = 32;
-	texH = 32;
+	texW = 16;
+	texH = 16;
 	pbody = Engine::GetInstance().physics->CreateCircle((int)position.getX(), (int)position.getY(), texH / 2, bodyType::DYNAMIC);
 
 	pbody->listener = this;

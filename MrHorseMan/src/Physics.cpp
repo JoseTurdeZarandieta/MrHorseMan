@@ -258,14 +258,15 @@ void Physics::BeginContact(b2ShapeId shapeA, b2ShapeId shapeB)
 
     PhysBody* physA = BodyToPhys(bodyA);
     PhysBody* physB = BodyToPhys(bodyB);
-    if (!physA || !physB) return;                  // user data cleared
-
-   /* if (physA->listener && !IsPendingToDelete(physA)) physA->listener->OnCollision(physA, physB);
-    if   (physB->listener && !IsPendingToDelete(physB))   physB->listener->OnCollision(physB, physA);*/
+    if (!physA || !physB) return;
 
     if (IsPendingToDelete(physA) || IsPendingToDelete(physB)) return;
     
     if (physA->listener)    physA->listener->OnCollision(physA, physB);
+    if (!b2Body_IsValid(bodyB)) return;
+    physB = BodyToPhys(bodyB);
+    if (!physB) return;
+    if (IsPendingToDelete(physB)) return;
     if (physB->listener)    physB->listener->OnCollision(physB, physA);
 }
 
@@ -282,8 +283,14 @@ void Physics::EndContact(b2ShapeId shapeA, b2ShapeId shapeB)
     if (!physA || !physB) return;
     if (IsPendingToDelete(physA) || IsPendingToDelete(physB)) return;
 
-    if (physA->listener /*&& !IsPendingToDelete(physA)*/) physA->listener->OnCollisionEnd(physA, physB);
-    if (physB->listener /*&& !IsPendingToDelete(physB)*/) physB->listener->OnCollisionEnd(physB, physA);
+    if (physA->listener) physA->listener->OnCollisionEnd(physA, physB);
+
+    if (!b2Body_IsValid(bodyB)) return;
+
+    physB = BodyToPhys(bodyB);
+    if (!physB) return;
+    if (IsPendingToDelete(physB)) return;
+    if (physB->listener) physB->listener->OnCollisionEnd(physB, physA);
 }
 
 
@@ -490,8 +497,11 @@ void Physics::SetTransform(PhysBody* body, float x, float y) {
 
     b2Body_SetLinearVelocity(id, zero); //sets velocity @ 0
 
+    /*b2Transform xf = b2Body_GetTransform(id);
+    b2Vec2 newPos{ x,y };*/
+
+    b2Vec2 newPos{ PIXEL_TO_METERS(x), PIXEL_TO_METERS(y) };
     b2Transform xf = b2Body_GetTransform(id);
-    b2Vec2 newPos{ x,y };
 
     b2Body_SetTransform(id, newPos, xf.q);
     b2Body_SetAwake(id, true);
