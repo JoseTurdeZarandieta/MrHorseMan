@@ -61,6 +61,13 @@ bool Player::Update(float dt)
 	if(!dashed)velocity = { 0, velocity.y }; // Reset horizontal velocity
 	bool moving = false;
 
+	//GodMode
+	if (Engine::GetInstance().input->GetKey(SDL_SCANCODE_F10) == KEY_DOWN) {
+		LOG("GodMode_Switched");
+		if (godMode == false) godMode = true;
+		if (godMode == true) godMode = false;
+	}
+
 	// Move left/right
 	if (Engine::GetInstance().input->GetKey(SDL_SCANCODE_A) == KEY_REPEAT) {
 		velocity.x = -speed;
@@ -82,10 +89,24 @@ bool Player::Update(float dt)
 		if (isGrounded)
 			anims.SetCurrent("idle");
 
+	// Move up/down
+	if (godMode == true) {
+
+		if (Engine::GetInstance().input->GetKey(SDL_SCANCODE_W) == KEY_REPEAT) {
+			velocity.y = -speed;
+			moving = true;
+		}
+
+		if (Engine::GetInstance().input->GetKey(SDL_SCANCODE_S) == KEY_REPEAT) {
+			velocity.y = +speed;
+			moving = true;
+		}
+	}
+
 	//Dash															
-	if (Engine::GetInstance().input->GetKey(SDL_SCANCODE_S) == KEY_DOWN && dashed == false && (isJumping == true || isGrounded == true)) {
+	if (Engine::GetInstance().input->GetKey(SDL_SCANCODE_LSHIFT) == KEY_DOWN && dashed == false && (isJumping == true || isGrounded == true)) {
 		LOG("funciona");
-		dashed == true;
+		dashed = true;
 		currentTime = 0.0f;
 
 		b2Body_SetGravityScale(pbody->body, 0.0f); //desactiva gravedad
@@ -95,12 +116,12 @@ bool Player::Update(float dt)
 	}
 
 	if (dashed == true) {
-		currentTime += deltaTime; // vas contando
+		currentTime += deltaTime; 
 
 		if (currentTime >= maxTime) {
 			dashed = false;
 
-			b2Body_SetGravityScale(pbody->body, 1.0f); //activas gravedad
+			b2Body_SetGravityScale(pbody->body, 1.0f); //activa gravedad
 		}
 	}
 
@@ -185,60 +206,68 @@ bool Player::CleanUp()
 
 // L08 TODO 6: Define OnCollision function for the player. 
 void Player::OnCollision(PhysBody* physA, PhysBody* physB) {
-	switch (physB->ctype)
-	{
-	case ColliderType::PLATFORM:
-	{
-		int px, py;
-		int bx, by;
-		pbody->GetPosition(px, py);
-		physB->GetPosition(bx, by);
-
-		// Compute vertical and horizontal distance
-		float dy = py - by;
-		float dx = abs(px - bx);
-
-		// Only count as landing if the platform is below the player and horizontally aligned
-		if (dy < -texH / 2 && dx < texW) // platform below within tolerance
-		{
-			jumpCount = 0;
-			anims.SetCurrent("idle");
-		}
-		//LOG("Collision PLATFORM");
-		if (isJumping) {
-			int dmg = 0;
-			if (maxDownwardSpeed > fallSpeedDamageThreshold) {
-				float t = (std::min(maxDownwardSpeed, fallSpeedMax) - fallSpeedDamageThreshold) / std::max(0.07f, (fallSpeedMax - fallSpeedDamageThreshold));
-				dmg = (int)(t * 120.0f);
-				TakeDamage(dmg);
-			}
-			LOG("jump x platform. dmg %d", dmg);
-			maxDownwardSpeed = 0.0f;
-		}
-		//reset the jump flag when touching the ground
-		isJumping = false;
-		isGrounded = true;
-		//L10: TODO 6: Update the animation based on the player's state
-		LOG("Collision PLATFORM");
-		break;
+	
+	if (godMode) {
+		return;
 	}
-	case ColliderType::ITEM:
-		LOG("Collision ITEM");
-		Engine::GetInstance().audio->PlayFx(pickCoinFxId);
+	if (!godMode) {
 
-		if (physB && physB->listener) {
-			physB->listener->Destroy();
+
+		switch (physB->ctype)
+		{
+		case ColliderType::PLATFORM:
+		{
+			int px, py;
+			int bx, by;
+			pbody->GetPosition(px, py);
+			physB->GetPosition(bx, by);
+
+			// Compute vertical and horizontal distance
+			float dy = py - by;
+			float dx = abs(px - bx);
+
+			// Only count as landing if the platform is below the player and horizontally aligned
+			if (dy < -texH / 2 && dx < texW) // platform below within tolerance
+			{
+				jumpCount = 0;
+				anims.SetCurrent("idle");
+			}
+			//LOG("Collision PLATFORM");
+			if (isJumping) {
+				int dmg = 0;
+				if (maxDownwardSpeed > fallSpeedDamageThreshold) {
+					float t = (std::min(maxDownwardSpeed, fallSpeedMax) - fallSpeedDamageThreshold) / std::max(0.07f, (fallSpeedMax - fallSpeedDamageThreshold));
+					dmg = (int)(t * 120.0f);
+					TakeDamage(dmg);
+				}
+				LOG("jump x platform. dmg %d", dmg);
+				maxDownwardSpeed = 0.0f;
+			}
+			//reset the jump flag when touching the ground
+			isJumping = false;
+			isGrounded = true;
+			//L10: TODO 6: Update the animation based on the player's state
+			LOG("Collision PLATFORM");
+			break;
 		}
-		break;
-	case ColliderType::ENEMY:
-		TakeDamage(10);
-	case ColliderType::DEATHZONE:
+		case ColliderType::ITEM:
+			LOG("Collision ITEM");
+			Engine::GetInstance().audio->PlayFx(pickCoinFxId);
 
-	case ColliderType::UNKNOWN:
-		LOG("Collision UNKNOWN");
-		break;
-	default:
-		break;
+			if (physB && physB->listener) {
+				physB->listener->Destroy();
+			}
+			break;
+		case ColliderType::ENEMY:
+			TakeDamage(10);
+		case ColliderType::DEATHZONE:
+
+		case ColliderType::UNKNOWN:
+			LOG("Collision UNKNOWN");
+			break;
+		default:
+			break;
+		}
 	}
 }
 
