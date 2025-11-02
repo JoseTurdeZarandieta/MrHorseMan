@@ -68,6 +68,13 @@ bool Player::Update(float dt)
 	if(!dashed)velocity = { 0, velocity.y }; // Reset horizontal velocity
 	bool moving = false;
 
+	//GodMode
+	if (Engine::GetInstance().input->GetKey(SDL_SCANCODE_F10) == KEY_DOWN) {
+		LOG("GodMode_Switched");
+		if (godMode == false) godMode = true;
+		if (godMode == true) godMode = false;
+	}
+
 	// Move left/right
 	if (Engine::GetInstance().input->GetKey(SDL_SCANCODE_A) == KEY_REPEAT) {
 		velocity.x = -speed;
@@ -84,6 +91,20 @@ bool Player::Update(float dt)
 		flip = SDL_FLIP_NONE;
 		moving = true;
 		isRight = 1;
+	}
+
+	// Move up/down
+	if (godMode == true) {
+
+		if (Engine::GetInstance().input->GetKey(SDL_SCANCODE_W) == KEY_REPEAT) {
+			velocity.y = -speed;
+			moving = true;
+		}
+
+		if (Engine::GetInstance().input->GetKey(SDL_SCANCODE_S) == KEY_REPEAT) {
+			velocity.y = +speed;
+			moving = true;
+		}
 	}
 
 	//Dash															
@@ -191,7 +212,7 @@ bool Player::CleanUp()
 
 // L08 TODO 6: Define OnCollision function for the player. 
 void Player::OnCollision(PhysBody* physA, PhysBody* physB) {
-
+	
 	switch (physB->ctype)
 	{	
 	case ColliderType::PLATFORM:
