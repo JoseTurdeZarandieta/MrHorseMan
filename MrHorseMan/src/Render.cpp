@@ -316,5 +316,6 @@ bool Render::DrawText(const char* text, int x, int y) {
 	SDL_FRect dst{ (float)x, (float)y, width, height };
 	bool worksOk = SDL_RenderTexture(renderer, tex, nullptr, &dst);
 	SDL_DestroyTexture(tex);
+	LOG("Works Ok");
 	return worksOk;
 }
