@@ -3,6 +3,7 @@
 #include "Module.h"
 #include <list>
 #include <vector>
+#include <unordered_map>
 
 // L09: TODO 5: Add attributes to the property structure
 struct Properties
@@ -99,6 +100,17 @@ struct MapData
     std::list<MapLayer*> layers;
 };
 
+struct TiledObject {
+    std::string name;
+    std::string type;
+    float x = 0.0f;
+    float y = 0.0f;
+    float width = 0.0f;
+    float height = 0.0f;
+    std::unordered_map<std::string, std::string> properties;
+};
+
+
 class Map : public Module
 {
 public:
@@ -138,9 +150,12 @@ public:
 public: 
     std::string mapFileName;
     std::string mapPath;
+    std::vector<TiledObject> GetObjects(const std::string& layerName) const;
 
 private:
     bool mapLoaded;
     // L06: DONE 1: Declare a variable data of the struct MapData
     MapData mapData;
+
+    std::unordered_map<std::string, std::vector<TiledObject>> objectLayers_;
 };

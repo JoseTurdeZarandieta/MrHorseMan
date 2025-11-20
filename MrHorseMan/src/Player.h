@@ -27,6 +27,14 @@ public:
 	void OnCollision(PhysBody* physA, PhysBody* physB);
 	void OnCollisionEnd(PhysBody* physA, PhysBody* physB);
 
+	void TakeDamage(int amount);
+	void HealToFull();
+	void Respawn();
+
+	int GetHealth() const {
+		return health;
+	}
+
 public:
 
 	//Declare player parameters
@@ -40,8 +48,16 @@ public:
 
 	// L08 TODO 5: Add physics to the player - declare a Physics body
 	PhysBody* pbody;
-	float jumpForce = 2.5f; // The force to apply when jumping
+	float jumpForce = 2.0f; // The force to apply when jumping
 	bool isJumping = false; // Flag to check if the player is currently jumping
+
+	bool pendingRespawn = false;
+
+	int health = 100;
+	int maxHealth = 100;
+	Vector2D spawnPos = { 96,96 };
+	float fallSpeedDamageThreshold = 10.0f;
+	float fallSpeedMax = 25.0f;
 
 private: 
 	b2Vec2 velocity;
@@ -49,7 +65,17 @@ private:
 	AnimationSet anims;
 	SDL_FlipMode flip = SDL_FLIP_NONE;
 
+	float maxDownwardSpeed = 0.0f;
 	bool isGrounded = false;
+	bool godMode = false;
+	bool dashed = false;
 	int jumpCount = 0;
+	int isRight = 1;
+	float currentTime = 0.0f;
+	float maxTime = 1.0f;
+	float deltaTime = 0.0f;
+	float lastTime = 0.0f;
+	
+
 	const int maxJumps = 2; // 1 ground + 1 air (double jump)
 };

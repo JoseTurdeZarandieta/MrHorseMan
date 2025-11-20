@@ -53,7 +53,7 @@ bool Map::Update(float dt)
                         //Check if the gid is different from 0 - some tiles are empty
                         if (gid != 0) {
                             //L09: TODO 3: Obtain the tile set using GetTilesetFromTileId
-                            TileSet* tileSet = mapData.tilesets.front();
+                            TileSet* tileSet = GetTilesetFromTileId(gid);
                             if (tileSet != nullptr) {
                                 //Get the Rect from the tileSetTexture;
                                 SDL_Rect tileRect = tileSet->GetRect(gid);
@@ -75,8 +75,13 @@ bool Map::Update(float dt)
 // L09: TODO 2: Implement function to the Tileset based on a tile id
 TileSet* Map::GetTilesetFromTileId(int gid) const
 {
-	TileSet* set = nullptr;
-
+    TileSet* set = nullptr;
+    for (const auto& tileset : mapData.tilesets) {
+        set = tileset;
+        if (gid >= tileset->firstGid && gid < tileset->firstGid + tileset->tileCount) {
+            break;
+        }
+    }
     return set;
 }
 
@@ -174,6 +179,60 @@ bool Map::Load(std::string path, std::string fileName)
             mapData.layers.push_back(mapLayer);
         }
 
+        //spawning
+
+        for (pugi::xml_node objectNode = mapFileXML.child("map").child("objectgroup"); objectNode; objectNode = objectNode.next_sibling("objectgroup"))
+        {
+            std::string layerName = objectNode.attribute("name").as_string();
+            std::vector<TiledObject> list;
+
+            for (pugi::xml_node object = objectNode.child("object"); object; object = object.next_sibling("object"))
+            {
+                TiledObject to;
+                to.name = object.attribute("name").as_string();
+              /* type (or) class to spawn enything was giving errors */
+                const char* rawType = object.attribute("type").as_string();
+                if (rawType == nullptr || *rawType == '\0')
+                    rawType = object.attribute("class").as_string(); //depending on Tiled version, class = type. can't seem to be able to write class on map.h as it expects there to be smth else
+                to.type = rawType ? rawType : "";
+
+                to.x = object.attribute("x").as_float();
+                to.y = object.attribute("y").as_float();
+                to.width = object.attribute("width").as_float();
+                to.height = object.attribute("height").as_float();
+
+                pugi::xml_node props = object.child("properties");
+                if (props)
+                {
+                    for (pugi::xml_node p = props.child("property"); p; p = p.next_sibling("property"))
+                    {
+                        std::string key = p.attribute("name").as_string();
+                        std::string val = p.attribute("value").as_string();
+                        if (val.empty() && p.child_value() && *p.child_value())
+                            val = p.child_value();
+                        to.properties.emplace(std::move(key), std::move(val));
+                    }
+                }
+                list.push_back(std::move(to));
+            }
+
+            if (!list.empty()) {
+                objectLayers_[layerName] = std::move(list);
+                LOG("Spawns loaded: %zu objects from layer '%s'", objectLayers_[layerName].size(), layerName.c_str());
+            }
+            auto dz = objectLayers_.find("DeathZones");
+            if (dz != objectLayers_.end()) {
+                for (const auto& origin : dz->second) {
+                    float centerx = origin.x + origin.width * 0.5f;
+                    float centery = origin.y + origin.height * 0.5f;
+
+                    PhysBody* pbody = Engine::GetInstance().physics->CreateRectangleSensor(centerx, centery, origin.width, origin.height, STATIC);
+                    pbody->ctype = ColliderType::DEATHZONE;
+                }
+            }
+        }
+
+
         // L08 TODO 3: Create colliders
         // L08 TODO 7: Assign collider type
         // Later you can create a function here to load and create the colliders from the map
@@ -184,7 +243,7 @@ bool Map::Load(std::string path, std::string fileName)
                 for (int i = 0; i < mapData.width; i++) {
                     for (int j = 0; j < mapData.height; j++) {
                         int gid = mapLayer->Get(i, j);
-                        if (gid == 49) {
+                        if (gid == 50) {
                             Vector2D mapCoord = MapToWorld(i, j);
                             PhysBody* c1 = Engine::GetInstance().physics.get()->CreateRectangle(mapCoord.getX()+ mapData.tileWidth/2, mapCoord.getY()+ mapData.tileHeight/2, mapData.tileWidth, mapData.tileHeight, STATIC);
                             c1->ctype = ColliderType::PLATFORM;
@@ -228,6 +287,12 @@ bool Map::Load(std::string path, std::string fileName)
 
     mapLoaded = ret;
     return ret;
+}
+
+std::vector<TiledObject> Map::GetObjects(const std::string& layerName) const {
+    auto it = objectLayers_.find(layerName);
+    if (it != objectLayers_.end()) return it->second;
+    return{};
 }
 
 // L07: TODO 8: Create a method that translates x,y coordinates from map positions to world positions

@@ -29,6 +29,7 @@ enum class ColliderType {
     ITEM,
     PLATFORM,
     ENEMY,
+    DEATHZONE,
     UNKNOWN
     // ..
 };
@@ -91,6 +92,8 @@ public:
 
     // --- Impulse helper (handy for jumps/dashes)
     void   ApplyLinearImpulseToCenter(PhysBody* p, float ix, float iy, bool wake = true) const;
+
+    void   SetTransform(PhysBody* body, float x, float y);
 
 private:
     // helpers

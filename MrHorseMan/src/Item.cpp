@@ -50,13 +50,30 @@ bool Item::Update(float dt)
 
 	Engine::GetInstance().render->DrawTexture(texture, x - texW / 2, y - texH / 2);
 
+	if (isPicked) {
+		active = false;
+
+		if (pbody) {
+			pbody->listener = nullptr;
+			Engine::GetInstance().physics->DeletePhysBody(pbody);
+			pbody = nullptr;
+		}
+		Engine::GetInstance().entityManager->DestroyEntity(shared_from_this());
+		return true;
+	}
+
 	return true;
 }
 
 bool Item::CleanUp()
 {
 	Engine::GetInstance().textures->UnLoad(texture);
+	if (pbody) {
+		pbody->listener = nullptr;
+	}
 	Engine::GetInstance().physics->DeletePhysBody(pbody);
+	pbody = nullptr;
+
 	return true;
 }
 
@@ -67,3 +84,4 @@ bool Item::Destroy()
 	Engine::GetInstance().entityManager->DestroyEntity(shared_from_this());
 	return true;
 }
+

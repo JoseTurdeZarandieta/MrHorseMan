@@ -5,6 +5,7 @@
 #include "Scene.h"
 #include "Log.h"
 #include "Item.h"
+#include "Enemy.h"
 
 EntityManager::EntityManager() : Module()
 {
@@ -75,6 +76,9 @@ std::shared_ptr<Entity> EntityManager::CreateEntity(EntityType type)
 	case EntityType::ITEM:
 		entity = std::make_shared<Item>();
 		break;
+	case EntityType::ENEMY:
+		entity = std::make_shared<Enemy>();
+		break;
 	default:
 		break;
 	}
@@ -94,6 +98,15 @@ void EntityManager::AddEntity(std::shared_ptr<Entity> entity)
 {
 	if ( entity != nullptr) entities.push_back(entity);
 }
+
+void EntityManager::resetEnemiesToSpwan() {
+	for (auto& entity : entities) {
+		if (entity->type == EntityType::ENEMY)
+			static_cast<Enemy*>(entity.get())->ResetToSpawn();
+	}
+}
+
+
 
 bool EntityManager::Update(float dt)
 {
