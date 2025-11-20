@@ -109,19 +109,18 @@ bool Player::Update(float dt)
 
 	//Dash															
 	if (Engine::GetInstance().input->GetKey(SDL_SCANCODE_S) == KEY_DOWN && dashed == false && (isJumping == true || isGrounded == true)) {
-		LOG("funciona");
-		dashed == true;
+		LOG("dash");
+		dashed = true;
 		currentTime = 0.0f;
 
 		b2Body_SetGravityScale(pbody->body, 0.0f); //desactiva gravedad
-		Engine::GetInstance().physics->SetLinearVelocity(pbody, {100.0f * isRight, 0.0f});
-
-		
+		velocity.y = 0;
+		physics->ApplyLinearImpulseToCenter(pbody, 500.0f * isRight,0.0f, true);
 	}
 
 	if (dashed == true) {
-		currentTime += deltaTime; // vas contando
-
+		currentTime += dt; // vas contando
+		LOG("dashing %f", currentTime);
 		if (currentTime >= maxTime) {
 			dashed = false;
 
