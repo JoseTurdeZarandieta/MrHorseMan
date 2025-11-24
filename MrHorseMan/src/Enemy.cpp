@@ -30,13 +30,13 @@ bool Enemy::Awake() {
 
 bool Enemy::Start() {
 	spawnPos = position;
-	texture = Engine::GetInstance().textures->Load("Assets/Textures/BudEnem_spritesheet.png");
+	texture = Engine::GetInstance().textures->Load("Assets/Textures/rino_sprites.png");
 
-	std::unordered_map<int, std::string> animNames = { {0, "move"}/*, {5, "move"} */};
-	anims.LoadFromTSX("Assets/Textures/BudEnem_spritesheet.tsx", animNames);
+	std::unordered_map<int, std::string> animNames = { {1, "move"}/*, {5, "move"} */};
+	anims.LoadFromTSX("Assets/Textures/rino.tsx", animNames);
 	anims.SetCurrent("move");
 
-	texW = 32;
+	texW = 64;
 	texH = 32;
 	pbody = Engine::GetInstance().physics->CreateCircle((int)position.getX(), (int)position.getY(), texH / 2, bodyType::DYNAMIC);
 
@@ -53,8 +53,11 @@ bool Enemy::Start() {
 
 bool Enemy::Update(float dt) {
 
-	Physics* physics = Engine::GetInstance().physics.get();
+	anims.Update(dt);
+	const SDL_Rect& animFrame = anims.GetCurrentFrame();
 
+	Physics* physics = Engine::GetInstance().physics.get();
+	
 	b2Vec2 velocity = physics->GetLinearVelocity(pbody);
 	velocity = { 0, velocity.y };
 
@@ -67,7 +70,7 @@ bool Enemy::Update(float dt) {
 	if (x < patrolLeft)		direction = 1;
 	if (x > patrolRight)	direction = -1;
 
-	Engine::GetInstance().render->DrawTexture(texture, x - texW / 2, y - texH / 2);
+	Engine::GetInstance().render->DrawTexture(texture, x - texW / 2, y - texH / 2, &animFrame);
 
 	return true;
 }

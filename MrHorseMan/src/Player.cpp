@@ -71,8 +71,8 @@ bool Player::Update(float dt)
 	//GodMode
 	if (Engine::GetInstance().input->GetKey(SDL_SCANCODE_F10) == KEY_DOWN) {
 		LOG("GodMode_Switched");
-		if (godMode == false) godMode = true;
-		if (godMode == true) godMode = false;
+
+		godMode = !godMode;
 	}
 
 	// Move left/right
@@ -93,16 +93,26 @@ bool Player::Update(float dt)
 		isRight = 1;
 	}
 
-	// Move up/down
+	// Move godMode
 	if (godMode == true) {
 
-		if (Engine::GetInstance().input->GetKey(SDL_SCANCODE_W) == KEY_REPEAT) {
+		if (Engine::GetInstance().input->GetKey(SDL_SCANCODE_UP) == KEY_REPEAT) {
 			velocity.y = -speed;
 			moving = true;
 		}
 
-		if (Engine::GetInstance().input->GetKey(SDL_SCANCODE_S) == KEY_REPEAT) {
+		if (Engine::GetInstance().input->GetKey(SDL_SCANCODE_DOWN) == KEY_REPEAT) {
 			velocity.y = +speed;
+			moving = true;
+		}
+
+		if (Engine::GetInstance().input->GetKey(SDL_SCANCODE_LEFT) == KEY_REPEAT) {
+			velocity.x = -speed;
+			moving = true;
+		}
+
+		if (Engine::GetInstance().input->GetKey(SDL_SCANCODE_RIGHT) == KEY_REPEAT) {
+			velocity.x = +speed;
 			moving = true;
 		}
 	}
@@ -115,14 +125,13 @@ bool Player::Update(float dt)
 
 		b2Body_SetGravityScale(pbody->body, 0.0f); //desactiva gravedad
 		velocity.y = 0;
-		physics->ApplyLinearImpulseToCenter(pbody, 500.0f * isRight,0.0f, true);
+		physics->ApplyLinearImpulseToCenter(pbody, 10000.0f * isRight,0.0f, true);
 	}
 
 	if (dashed == true) {
 		currentTime += dt; // vas contando
 		LOG("dashing %f", currentTime);
 		if (currentTime >= maxTime) {
-			dashed = false;
 
 			b2Body_SetGravityScale(pbody->body, 1.0f); //activas gravedad
 		}
@@ -245,6 +254,7 @@ void Player::OnCollision(PhysBody* physA, PhysBody* physB) {
 		//reset the jump flag when touching the ground
 		isJumping = false;
 		isGrounded = true;
+		dashed = false;
 		//L10: TODO 6: Update the animation based on the player's state
 		LOG("Collision PLATFORM");
 		break;
