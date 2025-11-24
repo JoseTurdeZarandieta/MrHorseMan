@@ -61,139 +61,158 @@ bool Player::Update(float dt)
 		Respawn();
 	}
 
-	// Leer velocidad actual del cuerpo
+
+
+	// Read current velocity
 	b2Vec2 velocity = physics->GetLinearVelocity(pbody);
+	if(!dashed)velocity = { 0, velocity.y }; // Reset horizontal velocity
 	bool moving = false;
 
-	// ---------------------------------------------
-	// GodMode
-	// ---------------------------------------------
+	//GodMode
 	if (Engine::GetInstance().input->GetKey(SDL_SCANCODE_F10) == KEY_DOWN) {
 		LOG("GodMode_Switched");
+
 		godMode = !godMode;
 	}
 
-	// ---------------------------------------------
-	// Dash
-	// ---------------------------------------------
-	if (Engine::GetInstance().input->GetKey(SDL_SCANCODE_F) == KEY_DOWN && !dashed) {
-		dashed = true;
-		dashTimer = 0.0f;
-		dashDirection = isRight; // dirección actual
-		LOG("Dash activated! Direction: %d", dashDirection);
+	// Move left/right
+	if (Engine::GetInstance().input->GetKey(SDL_SCANCODE_A) == KEY_REPEAT) {
+		velocity.x = -speed;
+		//L10: TODO 6: Update the animation based on the player's state
+		anims.SetCurrent("move");
+		flip = SDL_FLIP_HORIZONTAL; //flips the player's character when moving left
+		moving = true;
+		isRight = -1;
+	}
+	else if (Engine::GetInstance().input->GetKey(SDL_SCANCODE_D) == KEY_REPEAT) {
+		velocity.x = speed;
+		//L10: TODO 6: Update the animation based on the player's state
+		anims.SetCurrent("move");
+		flip = SDL_FLIP_NONE;
+		moving = true;
+		isRight = 1;
 	}
 
-	if (dashed) {
-		dashTimer += dt;
+	// Features godMode
+	if (godMode == true) {
 
-		// Mantener velocidad horizontal fija durante el dash
-		velocity.x = dashSpeed * dashDirection;
-		physics->SetLinearVelocity(pbody, velocity);
-
-		// Terminar dash después de dashDuration
-		if (dashTimer >= dashDuration) {
-			dashed = false;
+		if (Engine::GetInstance().input->GetKey(SDL_SCANCODE_UP) == KEY_REPEAT) {
+			velocity.y = -speed;
+			moving = true;
 		}
 
-		// Salir del Update para evitar sobrescribir el dash con input horizontal
-		// Nota: el salto vertical seguirá funcionando
-	}
-	else {
-		// ---------------------------------------------
-		// Movimiento horizontal normal
-		// ---------------------------------------------
-		if (Engine::GetInstance().input->GetKey(SDL_SCANCODE_A) == KEY_REPEAT) {
+		if (Engine::GetInstance().input->GetKey(SDL_SCANCODE_DOWN) == KEY_REPEAT) {
+			velocity.y = +speed;
+			moving = true;
+		}
+
+		if (Engine::GetInstance().input->GetKey(SDL_SCANCODE_LEFT) == KEY_REPEAT) {
 			velocity.x = -speed;
-			anims.SetCurrent("move");
-			flip = SDL_FLIP_HORIZONTAL;
 			moving = true;
-			isRight = -1;
-		}
-		else if (Engine::GetInstance().input->GetKey(SDL_SCANCODE_D) == KEY_REPEAT) {
-			velocity.x = speed;
-			anims.SetCurrent("move");
-			flip = SDL_FLIP_NONE;
-			moving = true;
-			isRight = 1;
-		}
-		else {
-			velocity.x = 0;
 		}
 
-		// Movimiento vertical en GodMode
-		if (godMode) {
-			if (Engine::GetInstance().input->GetKey(SDL_SCANCODE_W) == KEY_REPEAT) {
-				velocity.y = -speed;
-				moving = true;
-			}
-			if (Engine::GetInstance().input->GetKey(SDL_SCANCODE_S) == KEY_REPEAT) {
-				velocity.y = speed;
-				moving = true;
-			}
+		if (Engine::GetInstance().input->GetKey(SDL_SCANCODE_RIGHT) == KEY_REPEAT) {
+			velocity.x = +speed;
+			moving = true;
 		}
 
-		// Aplicar velocidad normal
-		physics->SetLinearVelocity(pbody, velocity);
+		b2Body_SetGravityScale(pbody->body, 0.0f); //desactiva gravedad
+
 	}
 
-	// ---------------------------------------------
-	// Salto
-	// ---------------------------------------------
-	if (Engine::GetInstance().input->GetKey(SDL_SCANCODE_SPACE) == KEY_DOWN && jumpCount < maxJumps) {
+	//Dash															
+	if (Engine::GetInstance().input->GetKey(SDL_SCANCODE_S) == KEY_DOWN && dashed == false && (isJumping == true || isGrounded == true)) {
+		LOG("dash");
+		dashed = true;
+		currentTime = 0.0f;
+
+		b2Body_SetGravityScale(pbody->body, 0.0f); //desactiva gravedad
 		velocity.y = 0;
-		physics->SetLinearVelocity(pbody, velocity);
+		physics->ApplyLinearImpulseToCenter(pbody, 10000.0f * isRight,0.0f, true);
+	}
+
+	if (dashed == true) {
+		currentTime += dt; // vas contando
+		LOG("dashing %f", currentTime);
+		if (currentTime >= maxTime) {
+
+			b2Body_SetGravityScale(pbody->body, 1.0f); //activas gravedad
+		}
+	}
+
+	// Jump (impulse once)
+	if (Engine::GetInstance().input->GetKey(SDL_SCANCODE_SPACE) == KEY_DOWN && jumpCount < maxJumps) {
+		b2Vec2 vel = physics->GetLinearVelocity(pbody); 
+		vel.y = 0;
+		physics->SetLinearVelocity(pbody, vel); 
 		physics->ApplyLinearImpulseToCenter(pbody, 0.0f, -jumpForce, true);
+		//L10: TODO 6: Update the animation based on the player's state
 		anims.SetCurrent("jump");
 		isJumping = true;
 		isGrounded = false;
 		jumpCount++;
 	}
-
-	if (!isJumping && !moving) {
+	if (!isJumping && !moving)
 		anims.SetCurrent("idle");
+
+
+// Preserve vertical speed while jumping
+if (isJumping == true) {
+	velocity.y = physics->GetYVelocity(pbody);
+
+	if (velocity.y > maxDownwardSpeed) {
+		maxDownwardSpeed = velocity.y;
 	}
-
-	// Preserve vertical speed while jumping
-	if (isJumping) {
-		velocity.y = physics->GetYVelocity(pbody);
-		if (velocity.y > maxDownwardSpeed) {
-			maxDownwardSpeed = velocity.y;
-		}
-	}
-
-	// Respawn si health <= 0
-	if (health <= 0) {
-		Respawn();
-	}
-
-	// ---------------------------------------------
-	// Animaciones y render
-	// ---------------------------------------------
-	anims.Update(dt);
-	SDL_Rect animFrame = anims.GetCurrentFrame();
-
-	int x, y;
-	pbody->GetPosition(x, y);
-	position.setX((float)x);
-	position.setY((float)y);
-
-	float limitLeft = Engine::GetInstance().render->camera.w / 4;
-	float limitRight = Engine::GetInstance().map->GetMapSizeInPixels().getX() - Engine::GetInstance().render->camera.w * 3 / 4;
-	if (position.getX() - limitLeft > 0 && position.getX() < limitRight) {
-		Engine::GetInstance().render->camera.x = -position.getX() + Engine::GetInstance().render->camera.w / 4;
-	}
-
-	float limitUp = Engine::GetInstance().render->camera.h / 4;
-	float limitDown = Engine::GetInstance().map->GetMapSizeInPixels().getY() - Engine::GetInstance().render->camera.h * 3 / 4;
-	if (position.getY() - limitUp > 0 && position.getY() < limitDown) {
-		Engine::GetInstance().render->camera.y = -position.getY() + Engine::GetInstance().render->camera.h / 4;
-	}
-
-	Engine::GetInstance().render->DrawTexture(texture, x - texW / 2, y - 1.5f * texH, &animFrame, 1.0f, 0.0, INT_MAX, INT_MAX, flip);
-
-	return true;
 }
 
+// Apply velocity via helper
+physics->SetLinearVelocity(pbody, velocity);
+
+if (health <= 0) {
+	Respawn();
+}
+// L10: TODO 5: Update the animation based on the player's state (moving, jumping, idle)
+anims.Update(dt);
+SDL_Rect animFrame = anims.GetCurrentFrame();
+
+// Update render position using your PhysBody helper
+int x, y;
+pbody->GetPosition(x, y);
+position.setX((float)x);
+position.setY((float)y);
+
+//L10: TODO 7: Center the camera on the player
+float limitLeft = Engine::GetInstance().render->camera.w / 4;
+float limitRight = Engine::GetInstance().map->GetMapSizeInPixels().getX() - Engine::GetInstance().render->camera.w * 3 / 4;;
+if (position.getX() - limitLeft > 0 && position.getX() < limitRight) {
+	Engine::GetInstance().render->camera.x = -position.getX() + Engine::GetInstance().render->camera.w / 4;
+
+}
+
+float limitUp = Engine::GetInstance().render->camera.h / 4;
+float limitDown = Engine::GetInstance().map->GetMapSizeInPixels().getY() - Engine::GetInstance().render->camera.h * 3 / 4;
+if (position.getY() - limitUp > 0 && position.getY() < limitDown) {
+	Engine::GetInstance().render->camera.y = -position.getY() + Engine::GetInstance().render->camera.h / 4;
+
+}
+
+// L10: TODO 5: Draw the player using the texture and the current animation frame
+Engine::GetInstance().render->DrawTexture(texture, x - texW / 2, y - 1.5* texH, &animFrame, 1.0f, 0.0, INT_MAX, INT_MAX, flip);
+
+//health screen display TODO NEXT TIME. THIS TIME, NO UI REQUIRED
+//char hpText[32];A
+//snprintf(hpText, sizeof(hpText), "HP: %d", health);
+//
+//int screenW = Engine::GetInstance().render->camera.w;
+//int margin = 12;
+//int posTextX = -Engine::GetInstance().render->camera.w + (screenW - 100);
+//int posTextY = Engine::GetInstance().render->camera.y + margin;
+//
+//Engine::GetInstance().render->DrawText(hpText, posTextX, posTextY);
+
+
+return true;
+}
 
 bool Player::CleanUp()
 {
@@ -238,6 +257,7 @@ void Player::OnCollision(PhysBody* physA, PhysBody* physB) {
 		//reset the jump flag when touching the ground
 		isJumping = false;
 		isGrounded = true;
+		dashed = false;
 		//L10: TODO 6: Update the animation based on the player's state
 		LOG("Collision PLATFORM");
 		break;
@@ -256,12 +276,16 @@ void Player::OnCollision(PhysBody* physA, PhysBody* physB) {
 		}
 		break;
 	case ColliderType::ENEMY:
-		TakeDamage(10);
-		LOG("Collision Enemy. Health %d", health);
+		if (!godMode) {
+			TakeDamage(10);
+			LOG("Collision Enemy. Health %d", health);
+		}
 		break;
 	case ColliderType::DEATHZONE:
-		LOG("DeathZone hit. Respawning");
-		pendingRespawn = true;
+		if (!godMode) {
+			LOG("DeathZone hit. Respawning");
+			pendingRespawn = true;
+		}
 		break;
 	case ColliderType::UNKNOWN:
 		LOG("Collision UNKNOWN");
