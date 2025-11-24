@@ -93,7 +93,7 @@ bool Player::Update(float dt)
 		isRight = 1;
 	}
 
-	// Move godMode
+	// Features godMode
 	if (godMode == true) {
 
 		if (Engine::GetInstance().input->GetKey(SDL_SCANCODE_UP) == KEY_REPEAT) {
@@ -115,6 +115,9 @@ bool Player::Update(float dt)
 			velocity.x = +speed;
 			moving = true;
 		}
+
+		b2Body_SetGravityScale(pbody->body, 0.0f); //desactiva gravedad
+
 	}
 
 	//Dash															
@@ -273,12 +276,16 @@ void Player::OnCollision(PhysBody* physA, PhysBody* physB) {
 		}
 		break;
 	case ColliderType::ENEMY:
-		TakeDamage(10);
-		LOG("Collision Enemy. Health %d", health);
+		if (!godMode) {
+			TakeDamage(10);
+			LOG("Collision Enemy. Health %d", health);
+		}
 		break;
 	case ColliderType::DEATHZONE:
-		LOG("DeathZone hit. Respawning");
-		pendingRespawn = true;
+		if (!godMode) {
+			LOG("DeathZone hit. Respawning");
+			pendingRespawn = true;
+		}
 		break;
 	case ColliderType::UNKNOWN:
 		LOG("Collision UNKNOWN");
