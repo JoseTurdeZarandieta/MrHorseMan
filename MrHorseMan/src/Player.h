@@ -75,6 +75,11 @@ private:
 	float maxTime = 1.0f;
 	float deltaTime = 0.0f;
 	float lastTime = 0.0f;
+
+	float dashDuration = 0.5f; // segundos
+	float dashTimer = 0.0f;
+	float dashSpeed = 100.0f;   // velocidad horizontal
+	int dashDirection = 1;      // 1 = derecha, -1 = izquierda
 	
 
 	const int maxJumps = 2; // 1 ground + 1 air (double jump)
