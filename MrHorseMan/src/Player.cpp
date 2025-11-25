@@ -48,6 +48,13 @@ bool Player::Start() {
 	pbody->ctype = ColliderType::PLAYER;
 
 	pickCoinFxId = Engine::GetInstance().audio->LoadFx("Assets/Audio/Fx/coin-collision-sound-342335.wav");
+	jump1FX = Engine::GetInstance().audio->LoadFx("Assets/Audio/Fx/1st jump.wav");
+	jump2FX = Engine::GetInstance().audio->LoadFx("Assets/Audio/Fx/2nd jump.wav");
+	walkingFX = Engine::GetInstance().audio->LoadFx("Assets/Audio/Fx/correr.wav");
+	gameOverFX = Engine::GetInstance().audio->LoadFx("Assets/Audio/Fx/game over.wav");
+	hitedFX = Engine::GetInstance().audio->LoadFx("Assets/Audio/Fx/hited.wav");
+	horseNeighFX = Engine::GetInstance().audio->LoadFx("Assets/Audio/Fx/horse-neigh.wav");
+	lvlFinishedFX = Engine::GetInstance().audio->LoadFx("Assets/Audio/Fx/level finished.wav");
 
 	return true;
 }
@@ -77,6 +84,7 @@ bool Player::Update(float dt)
 
 	// Move left/right
 	if (Engine::GetInstance().input->GetKey(SDL_SCANCODE_A) == KEY_REPEAT) {
+		Engine::GetInstance().audio->PlayFx(walkingFX);
 		velocity.x = -speed;
 		//L10: TODO 6: Update the animation based on the player's state
 		anims.SetCurrent("move");
@@ -85,6 +93,7 @@ bool Player::Update(float dt)
 		isRight = -1;
 	}
 	else if (Engine::GetInstance().input->GetKey(SDL_SCANCODE_D) == KEY_REPEAT) {
+		Engine::GetInstance().audio->PlayFx(walkingFX);
 		velocity.x = speed;
 		//L10: TODO 6: Update the animation based on the player's state
 		anims.SetCurrent("move");
@@ -142,6 +151,13 @@ bool Player::Update(float dt)
 
 	// Jump (impulse once)
 	if (Engine::GetInstance().input->GetKey(SDL_SCANCODE_SPACE) == KEY_DOWN && jumpCount < maxJumps) {
+		if (jumpCount < 1) {
+			Engine::GetInstance().audio->PlayFx(jump1FX);
+		}
+		else if(jumpCount > 0){
+			Engine::GetInstance().audio->PlayFx(jump2FX);
+		}
+		
 		b2Vec2 vel = physics->GetLinearVelocity(pbody); 
 		vel.y = 0;
 		physics->SetLinearVelocity(pbody, vel); 

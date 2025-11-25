@@ -70,6 +70,8 @@ bool Enemy::Update(float dt) {
 	if (x < patrolLeft)		direction = 1;
 	if (x > patrolRight)	direction = -1;
 
+	Vector2D pos = { (float)(x - texW / 2), (float)(y - texH / 2) };
+
 	Engine::GetInstance().render->DrawTexture(texture, x - texW / 2, y - texH / 2, &animFrame);
 
 	return true;

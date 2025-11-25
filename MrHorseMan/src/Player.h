@@ -45,6 +45,13 @@ public:
 
 	//Audio fx
 	int pickCoinFxId;
+	int jump1FX;
+	int jump2FX;
+	int walkingFX;
+	int gameOverFX;
+	int hitedFX;
+	int horseNeighFX;
+	int lvlFinishedFX;
 
 	// L08 TODO 5: Add physics to the player - declare a Physics body
 	PhysBody* pbody;
