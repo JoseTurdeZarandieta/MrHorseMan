@@ -84,7 +84,6 @@ bool Player::Update(float dt)
 
 	// Move left/right
 	if (Engine::GetInstance().input->GetKey(SDL_SCANCODE_A) == KEY_REPEAT) {
-		Engine::GetInstance().audio->PlayFx(walkingFX);
 		velocity.x = -speed;
 		//L10: TODO 6: Update the animation based on the player's state
 		anims.SetCurrent("move");
@@ -93,7 +92,6 @@ bool Player::Update(float dt)
 		isRight = -1;
 	}
 	else if (Engine::GetInstance().input->GetKey(SDL_SCANCODE_D) == KEY_REPEAT) {
-		Engine::GetInstance().audio->PlayFx(walkingFX);
 		velocity.x = speed;
 		//L10: TODO 6: Update the animation based on the player's state
 		anims.SetCurrent("move");
