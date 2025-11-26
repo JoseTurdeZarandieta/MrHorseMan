@@ -306,6 +306,15 @@ Vector2D Map::MapToWorld(int x, int y) const
     return ret;
 }
 
+Vector2D Map::WorldToMap(int x, int y) {
+
+    Vector2D ret(0, 0);
+    ret.setX((float)(x / mapData.tileWidth));
+    ret.setY((float)(y / mapData.tileHeight));
+
+    return ret;
+}
+
 // L09: TODO 6: Load a group of properties from a node and fill a list with it
 bool Map::LoadProperties(pugi::xml_node& node, Properties& properties)
 {
@@ -332,6 +341,21 @@ Vector2D Map::GetMapSizeInPixels()
     return sizeInPixels;
 }
 
+Vector2D Map::GetMapSizeInTiles()
+{
+    return Vector2D((float)mapData.width, (float)mapData.height);
+}
 
+// Method to get the navigation layer from the map
+MapLayer* Map::GetNavigationLayer() {
+    for (const auto& layer : mapData.layers) {
+        if (layer->properties.GetProperty("Navigation") != NULL &&
+            layer->properties.GetProperty("Navigation")->value) {
+            return layer;
+        }
+    }
+
+    return nullptr;
+}
 
 
