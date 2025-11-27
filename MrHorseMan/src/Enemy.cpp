@@ -8,6 +8,7 @@
 #include "Log.h"
 #include "EntityManager.h"
 #include "Map.h"
+#include "Player.h"
 
 
 
@@ -53,6 +54,7 @@ bool Enemy::Start() {
 
 bool Enemy::Update(float dt) {
 
+	void PerformPathFinding();
 	anims.Update(dt);
 	const SDL_Rect& animFrame = anims.GetCurrentFrame();
 
@@ -98,7 +100,17 @@ bool Enemy::CleanUp() {
 	return true;
 }
 
+void Enemy::PerformPathFinding() {
 
+	
+}
+
+Vector2D Enemy::GetPosition() {
+	int x, y;
+	pbody->GetPosition(x, y);
+	// Adjust for center
+	return Vector2D((float)x - texW / 2, (float)y - texH / 2);
+}
 
 
 
