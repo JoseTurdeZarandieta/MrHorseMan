@@ -4,6 +4,7 @@
 #include <box2d/box2d.h>
 #include <SDL3/SDL.h>
 #include "Animation.h"
+#include "Pathfinding.h"
 
 struct SDL_Texture;
 
@@ -69,11 +70,14 @@ public:
 	float fallSpeedDamageThreshold = 10.0f;
 	float fallSpeedMax = 25.0f;
 
+	std::shared_ptr<Pathfinding> pathfinding;
+
 private: 
 	b2Vec2 velocity;
 	// L10: TODO 4: Declare an AnimationSet to hold all player animations
 	AnimationSet anims;
 	SDL_FlipMode flip = SDL_FLIP_NONE;
+	
 
 	float maxDownwardSpeed = 0.0f;
 	bool isGrounded = false;

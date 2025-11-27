@@ -44,6 +44,11 @@ bool Enemy::Start() {
 	pbody->listener = this;
 	pbody->ctype = ColliderType::ENEMY;
 
+	pathfinding = std::make_shared<Pathfinding>();
+	Vector2D pos = GetPosition();	
+	Vector2D tilePos = Engine::GetInstance().map->WorldToMap((int)pos.getX(), (int)pos.getY() + 1);
+	pathfinding->ResetPath(tilePos);
+
 	if (patrolLeft == 0.0f && patrolRight == 0.0f) {
 		patrolLeft = position.getX() - 64.0f;
 		patrolRight = position.getX() + 64.0f;
@@ -102,7 +107,14 @@ bool Enemy::CleanUp() {
 
 void Enemy::PerformPathFinding() {
 
-	
+	if (Engine::GetInstance().input.get()->GetKey(SDL_SCANCODE_M) == KEY_DOWN) {
+		pathfinding->PropagateAStar(SQUARED);
+	}
+
+	if (Engine::GetInstance().input.get()->GetKey(SDL_SCANCODE_M) == KEY_REPEAT &&
+		Engine::GetInstance().input.get()->GetKey(SDL_SCANCODE_LSHIFT) == KEY_REPEAT) {
+		pathfinding->PropagateAStar(SQUARED);
+	}
 }
 
 Vector2D Enemy::GetPosition() {
