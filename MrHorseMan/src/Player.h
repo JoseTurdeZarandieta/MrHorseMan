@@ -27,6 +27,9 @@ public:
 	void OnCollision(PhysBody* physA, PhysBody* physB);
 	void OnCollisionEnd(PhysBody* physA, PhysBody* physB);
 
+	Vector2D GetPosition();
+	void SetPosition(Vector2D pos);
+
 	void TakeDamage(int amount);
 	void HealToFull();
 	void Respawn();

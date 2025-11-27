@@ -120,3 +120,9 @@ bool Scene::CleanUp()
 
 	return true;
 }
+
+// Return the player position
+Vector2D Scene::GetPlayerPosition()
+{
+    return player->GetPosition();
+}

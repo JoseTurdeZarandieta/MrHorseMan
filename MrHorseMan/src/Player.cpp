@@ -104,22 +104,22 @@ bool Player::Update(float dt)
 	if (godMode == true) {
 
 		if (Engine::GetInstance().input->GetKey(SDL_SCANCODE_UP) == KEY_REPEAT) {
-			velocity.y = -speed;
+			velocity.y = -speed *2;
 			moving = true;
 		}
 
 		if (Engine::GetInstance().input->GetKey(SDL_SCANCODE_DOWN) == KEY_REPEAT) {
-			velocity.y = +speed;
+			velocity.y = +speed*2;
 			moving = true;
 		}
 
 		if (Engine::GetInstance().input->GetKey(SDL_SCANCODE_LEFT) == KEY_REPEAT) {
-			velocity.x = -speed;
+			velocity.x = -speed*2;
 			moving = true;
 		}
 
 		if (Engine::GetInstance().input->GetKey(SDL_SCANCODE_RIGHT) == KEY_REPEAT) {
-			velocity.x = +speed;
+			velocity.x = +speed*2;
 			moving = true;
 		}
 
@@ -331,6 +331,17 @@ void Player::OnCollisionEnd(PhysBody* physA, PhysBody* physB)
 	default:
 		break;
 	}
+}
+
+Vector2D Player::GetPosition() {
+	int x, y;
+	pbody->GetPosition(x, y);
+	// Adjust for center
+	return Vector2D((float)x - texW / 2, (float)y - texH / 2);
+}
+
+void Player::SetPosition(Vector2D pos) {
+	pbody->SetPosition((int)(pos.getX() + texW / 2), (int)(pos.getY() + texH / 2));
 }
 
 void Player::TakeDamage(int amount) {
