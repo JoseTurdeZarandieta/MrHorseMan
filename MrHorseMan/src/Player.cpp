@@ -55,6 +55,7 @@ bool Player::Start() {
 	hitedFX = Engine::GetInstance().audio->LoadFx("Assets/Audio/Fx/hited.wav");
 	horseNeighFX = Engine::GetInstance().audio->LoadFx("Assets/Audio/Fx/horse-neigh.wav");
 	lvlFinishedFX = Engine::GetInstance().audio->LoadFx("Assets/Audio/Fx/level finished.wav");
+	dashFX = Engine::GetInstance().audio->LoadFx("Assets/Audio/Fx/dash.wav");
 
 	return true;
 }
@@ -133,6 +134,7 @@ bool Player::Update(float dt)
 		dashed = true;
 		currentTime = 0.0f;
 
+		Engine::GetInstance().audio->PlayFx(dashFX);
 		b2Body_SetGravityScale(pbody->body, 0.0f); //desactiva gravedad
 		velocity.y = 0;
 		physics->ApplyLinearImpulseToCenter(pbody, 10000.0f * isRight,0.0f, true);
@@ -251,6 +253,10 @@ void Player::OnCollision(PhysBody* physA, PhysBody* physB) {
 		float dy = py - by;
 		float dx = abs(px - bx);
 
+		if (dashed == true) {
+			b2Body_SetGravityScale(pbody->body, 1.0f);
+		}
+
 		// Only count as landing if the platform is below the player and horizontally aligned
 		if (dy < -texH / 2 && dx < texW) // platform below within tolerance
 		{
@@ -290,11 +296,38 @@ void Player::OnCollision(PhysBody* physA, PhysBody* physB) {
 		}
 		break;
 	case ColliderType::ENEMY:
-		if (!godMode) {
-			TakeDamage(10);
-			LOG("Collision Enemy. Health %d", health);
+	{
+		int px, py;
+		int ex, ey;
+		pbody->GetPosition(px, py);
+		physB->GetPosition(ex, ey);
+
+		// Si la Y del player es MÁS ALTA que la del enemigo (player por encima)
+		bool playerAbove = py < ey - (texH / 4);  // margen para evitar colisiones laterales
+
+		if (playerAbove)
+		{
+			LOG("PLAYER HA PISADO AL ENEMIGO COMO UN CAMIÓN");
+
+			// Rebote
+			Engine::GetInstance().physics->ApplyLinearImpulseToCenter(pbody, 0, -1.0f, true);
+
+			// Destruir el enemigo
+			physB->listener->Destroy();
+			
+
+		}
+		else
+		{
+
+			if (!godMode) {
+				TakeDamage(10);
+				LOG("Collision Enemy. Health %d", health);
+			}
 		}
 		break;
+	}
+
 	case ColliderType::DEATHZONE:
 		if (!godMode) {
 			LOG("DeathZone hit. Respawning");
@@ -368,6 +401,8 @@ void Player::Respawn() {
 	position = spawnPos;
 	isJumping = false;
 	isGrounded = false;
+	dashed = false;
+	b2Body_SetGravityScale(pbody->body, 1.0f); //activas gravedad
 	jumpCount = 0;
 	maxDownwardSpeed = 0.0f;
 	anims.SetCurrent("idle");

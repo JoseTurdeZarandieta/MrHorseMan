@@ -56,6 +56,7 @@ public:
 	int hitedFX;
 	int horseNeighFX;
 	int lvlFinishedFX;
+	int dashFX;
 
 	// L08 TODO 5: Add physics to the player - declare a Physics body
 	PhysBody* pbody;
@@ -69,6 +70,7 @@ public:
 	Vector2D spawnPos = { 96,96 };
 	float fallSpeedDamageThreshold = 10.0f;
 	float fallSpeedMax = 25.0f;
+
 
 	std::shared_ptr<Pathfinding> pathfinding;
 
