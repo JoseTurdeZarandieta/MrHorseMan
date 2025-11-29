@@ -137,7 +137,8 @@ bool Player::Update(float dt)
 		Engine::GetInstance().audio->PlayFx(dashFX);
 		b2Body_SetGravityScale(pbody->body, 0.0f); //desactiva gravedad
 		velocity.y = 0;
-		physics->ApplyLinearImpulseToCenter(pbody, 10000.0f * isRight,0.0f, true);
+		velocity.x = 0;
+		physics->ApplyLinearImpulseToCenter(pbody, 1000.0f * isRight,0.0f, true);
 	}
 
 	if (dashed == true) {
