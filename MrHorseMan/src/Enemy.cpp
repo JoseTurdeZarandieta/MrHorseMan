@@ -15,9 +15,6 @@
 
 Enemy::Enemy() : Entity(EntityType::ENEMY) {
 	name = "Enemy";
-
-	pbody->listener = this;
-	pbody->ctype = ColliderType::ENEMY;
 }
 
 Enemy::~Enemy() {
