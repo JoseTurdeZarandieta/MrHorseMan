@@ -315,6 +315,7 @@ void Player::OnCollision(PhysBody* physA, PhysBody* physB) {
 
 			// Destruir el enemigo
 			physB->listener->Destroy();
+			physB->listener->CleanUp();
 			
 
 		}
