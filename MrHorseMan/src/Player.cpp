@@ -162,7 +162,7 @@ bool Player::Update(float dt)
 
 			b2Body_SetGravityScale(pbody->body, 1.0f); //activas gravedad
 			dashing = false;
-			velocity.x = 0;
+			
 		}
 	}
 
@@ -302,6 +302,7 @@ void Player::OnCollision(PhysBody* physA, PhysBody* physB) {
 		isJumping = false;
 		isGrounded = true;
 		dashed = false;
+		dashing = false;
 		//L10: TODO 6: Update the animation based on the player's state
 		LOG("Collision PLATFORM");
 		break;
