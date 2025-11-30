@@ -97,7 +97,7 @@ bool Player::Update(float dt)
 	}
 
 	// Move left/right
-	if (Engine::GetInstance().input->GetKey(SDL_SCANCODE_A) == KEY_REPEAT) {
+	if (Engine::GetInstance().input->GetKey(SDL_SCANCODE_A) == KEY_REPEAT && dashing == false) {
 		velocity.x = -speed;
 		//L10: TODO 6: Update the animation based on the player's state
 		anims.SetCurrent("move");
@@ -105,7 +105,7 @@ bool Player::Update(float dt)
 		moving = true;
 		isRight = -1;
 	}
-	else if (Engine::GetInstance().input->GetKey(SDL_SCANCODE_D) == KEY_REPEAT) {
+	else if (Engine::GetInstance().input->GetKey(SDL_SCANCODE_D) == KEY_REPEAT && dashing == false) {
 		velocity.x = speed;
 		//L10: TODO 6: Update the animation based on the player's state
 		anims.SetCurrent("move");
@@ -145,13 +145,14 @@ bool Player::Update(float dt)
 	if (Engine::GetInstance().input->GetKey(SDL_SCANCODE_S) == KEY_DOWN && dashed == false && (isJumping == true || isGrounded == true)) {
 		LOG("dash");
 		dashed = true;
+		dashing = true;
 		currentTime = 0.0f;
 
 		Engine::GetInstance().audio->PlayFx(dashFX);
 		b2Body_SetGravityScale(pbody->body, 0.0f); //desactiva gravedad
 		velocity.y = 0;
-		velocity.x = 0;
-		physics->ApplyLinearImpulseToCenter(pbody, 1000.0f * isRight,0.0f, true);
+		physics->SetLinearVelocity(pbody, { 0, 0 });
+		physics->ApplyLinearImpulseToCenter(pbody, 2.0f * isRight,0.0f, true);
 	}
 
 	if (dashed == true) {
@@ -160,6 +161,8 @@ bool Player::Update(float dt)
 		if (currentTime >= maxTime) {
 
 			b2Body_SetGravityScale(pbody->body, 1.0f); //activas gravedad
+			dashing = false;
+			velocity.x = 0;
 		}
 	}
 
@@ -196,7 +199,9 @@ if (isJumping == true) {
 }
 
 // Apply velocity via helper
-physics->SetLinearVelocity(pbody, velocity);
+if (!dashing) {
+	physics->SetLinearVelocity(pbody, velocity);
+}
 
 if (health <= 0) {
 	Respawn();

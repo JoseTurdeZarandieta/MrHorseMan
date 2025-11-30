@@ -89,6 +89,7 @@ private:
 	bool isGrounded = false;
 	bool godMode = false;
 	bool dashed = false;
+	bool dashing = false;
 	int jumpCount = 0;
 	int isRight = 1;
 	float currentTime = 0.0f;
