@@ -72,6 +72,9 @@ public:
 	float fallSpeedDamageThreshold = 10.0f;
 	float fallSpeedMax = 25.0f;
 
+	//Controls view
+	bool showControlsImage = false;
+	SDL_Texture* controlsPNG = nullptr;
 
 	std::shared_ptr<Pathfinding> pathfinding;
 

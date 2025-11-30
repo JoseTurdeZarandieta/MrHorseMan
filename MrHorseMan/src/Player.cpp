@@ -47,6 +47,10 @@ bool Player::Start() {
 
 	pbody->ctype = ColliderType::PLAYER;
 
+	//Imagenes
+	controlsPNG = Engine::GetInstance().textures->Load("Assets/Textures/Controls.png");
+
+	//Audios
 	pickCoinFxId = Engine::GetInstance().audio->LoadFx("Assets/Audio/Fx/coin-collision-sound-342335.wav");
 	jump1FX = Engine::GetInstance().audio->LoadFx("Assets/Audio/Fx/1st jump.wav");
 	jump2FX = Engine::GetInstance().audio->LoadFx("Assets/Audio/Fx/2nd jump.wav");
@@ -74,6 +78,11 @@ bool Player::Update(float dt)
 		Respawn();
 	}
 
+	if (Engine::GetInstance().input->GetKey(SDL_SCANCODE_H) == KEY_DOWN)
+	{
+		showControlsImage = !showControlsImage;   // Cambia estado ON/OFF
+		LOG("Toggling help image: %s", showControlsImage ? "ON" : "OFF");
+	}
 
 	// Read current velocity
 	b2Vec2 velocity = physics->GetLinearVelocity(pbody);
@@ -219,18 +228,21 @@ if (position.getY() - limitUp > 0 && position.getY() < limitDown) {
 
 // L10: TODO 5: Draw the player using the texture and the current animation frame
 Engine::GetInstance().render->DrawTexture(texture, x - texW / 2, y - 1.5* texH, &animFrame, 1.0f, 0.0, INT_MAX, INT_MAX, flip);
+Engine::GetInstance().render->DrawTexture(texture, x - texW / 2, y - 1.5 * texH, &animFrame, 1.0f, 0.0, INT_MAX, INT_MAX, flip);
 
-//health screen display TODO NEXT TIME. THIS TIME, NO UI REQUIRED
-//char hpText[32];A
-//snprintf(hpText, sizeof(hpText), "HP: %d", health);
-//
-//int screenW = Engine::GetInstance().render->camera.w;
-//int margin = 12;
-//int posTextX = -Engine::GetInstance().render->camera.w + (screenW - 100);
-//int posTextY = Engine::GetInstance().render->camera.y + margin;
-//
-//Engine::GetInstance().render->DrawText(hpText, posTextX, posTextY);
+if (showControlsImage && controlsPNG != nullptr)
+{
+	int camX = Engine::GetInstance().render->camera.x;
+	int camY = Engine::GetInstance().render->camera.y;
 
+	Engine::GetInstance().render->DrawTexture(
+		controlsPNG,
+		-camX + 50,   // posición en pantalla
+		-camY + 50,
+		nullptr,
+		1.0f
+	);
+}
 
 return true;
 }
@@ -239,6 +251,8 @@ bool Player::CleanUp()
 {
 	LOG("Cleanup player");
 	Engine::GetInstance().textures->UnLoad(texture);
+	Engine::GetInstance().textures->UnLoad(controlsPNG);
+	controlsPNG = nullptr;
 	return true;
 }
 
