@@ -56,6 +56,7 @@ bool Player::Start() {
 	horseNeighFX = Engine::GetInstance().audio->LoadFx("Assets/Audio/Fx/horse-neigh.wav");
 	lvlFinishedFX = Engine::GetInstance().audio->LoadFx("Assets/Audio/Fx/level finished.wav");
 	dashFX = Engine::GetInstance().audio->LoadFx("Assets/Audio/Fx/dash.wav");
+	enemiDiedFx = Engine::GetInstance().audio->LoadFx("Assets/Audio/Fx/enemy_dead.wav");
 
 	return true;
 }
@@ -69,6 +70,9 @@ bool Player::Update(float dt)
 		Respawn();
 	}
 
+	if (Engine::GetInstance().input->GetKey(SDL_SCANCODE_F1) == KEY_DOWN && dashed == false && (isJumping == true || isGrounded == true)) {
+		Respawn();
+	}
 
 
 	// Read current velocity
@@ -309,6 +313,7 @@ void Player::OnCollision(PhysBody* physA, PhysBody* physB) {
 		if (playerAbove)
 		{
 			LOG("PLAYER HA PISADO AL ENEMIGO COMO UN CAMIÓN");
+			Engine::GetInstance().audio->PlayFx(enemiDiedFx);
 
 			// Rebote
 			Engine::GetInstance().physics->ApplyLinearImpulseToCenter(pbody, 0, -1.0f, true);
@@ -395,6 +400,7 @@ void Player::HealToFull() {
 
 void Player::Respawn() {
 	HealToFull();
+	Engine::GetInstance().audio->PlayFx(horseNeighFX);
 
 	Physics* physics = Engine::GetInstance().physics.get();
 	physics->SetLinearVelocity(pbody, { 0,0 });
