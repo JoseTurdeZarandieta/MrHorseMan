@@ -1,4 +1,4 @@
-#include "Player.h"
+﻿#include "Player.h"
 #include "Engine.h"
 #include "Textures.h"
 #include "Audio.h"
@@ -163,6 +163,27 @@ bool Player::Update(float dt)
 
 			b2Body_SetGravityScale(pbody->body, 1.0f); //activas gravedad
 			dashing = false;
+
+			// El dash ha terminado completamente
+			b2Vec2 endVel = physics->GetLinearVelocity(pbody);
+
+			// Si el jugador está pulsando A o D → retomar velocidad normal
+			if (Engine::GetInstance().input->GetKey(SDL_SCANCODE_A) == KEY_REPEAT)
+			{
+				endVel.x = -speed;
+			}
+			else if (Engine::GetInstance().input->GetKey(SDL_SCANCODE_D) == KEY_REPEAT)
+			{
+				endVel.x = speed;
+			}
+			else
+			{
+				// Si no pulsa nada -> quedas quieto horizontalmente
+				velocity.x = 0;
+			}
+
+			physics->SetLinearVelocity(pbody, endVel);
+
 			
 		}
 	}
@@ -243,7 +264,7 @@ if (showControlsImage && controlsPNG != nullptr)
 
 	Engine::GetInstance().render->DrawTexture(
 		controlsPNG,
-		-camX + 50,   // posici�n en pantalla
+		-camX + 50,   // posición en pantalla
 		-camY + 50,
 		nullptr,
 		1.0f
@@ -328,12 +349,12 @@ void Player::OnCollision(PhysBody* physA, PhysBody* physB) {
 		pbody->GetPosition(px, py);
 		physB->GetPosition(ex, ey);
 
-		// Si la Y del player es M�S ALTA que la del enemigo (player por encima)
+		// Si la Y del player es MÁS ALTA que la del enemigo (player por encima)
 		bool playerAbove = py < ey - (texH / 4);  // margen para evitar colisiones laterales
 
 		if (playerAbove)
 		{
-			LOG("PLAYER HA PISADO AL ENEMIGO COMO UN CAMI�N");
+			LOG("PLAYER HA PISADO AL ENEMIGO COMO UN CAMIÓN");
 			Engine::GetInstance().audio->PlayFx(enemiDiedFx);
 
 			// Rebote
