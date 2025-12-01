@@ -339,10 +339,9 @@ void Player::OnCollision(PhysBody* physA, PhysBody* physB) {
 			Engine::GetInstance().physics->ApplyLinearImpulseToCenter(pbody, 0, -1.0f, true);
 
 			// Destruir el enemigo
-			physB->listener->Destroy();
 			physB->listener->CleanUp();
 			
-
+			dashed == false;
 		}
 		else
 		{

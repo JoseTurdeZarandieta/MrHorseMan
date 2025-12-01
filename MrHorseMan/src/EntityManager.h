@@ -32,8 +32,6 @@ public:
 
 	void AddEntity(std::shared_ptr<Entity> entity);
 
-	void resetEnemiesToSpwan();
-
 public:
 
 	std::list<std::shared_ptr<Entity>> entities;

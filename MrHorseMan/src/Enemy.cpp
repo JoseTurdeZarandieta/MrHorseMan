@@ -102,6 +102,7 @@ bool Enemy::CleanUp() {
 
 	LOG("Cleanup enemy");
 	Engine::GetInstance().textures->UnLoad(texture);
+	Engine::GetInstance().physics->DeletePhysBody(pbody);
 	return true;
 }
 
