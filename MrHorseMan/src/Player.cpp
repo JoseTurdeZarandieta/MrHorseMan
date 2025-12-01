@@ -10,6 +10,7 @@
 #include "EntityManager.h"
 #include "Map.h"
 #include "Item.h"
+#include "Enemy.h"
 
 Player::Player() : Entity(EntityType::PLAYER)
 {
@@ -339,7 +340,8 @@ void Player::OnCollision(PhysBody* physA, PhysBody* physB) {
 			Engine::GetInstance().physics->ApplyLinearImpulseToCenter(pbody, 0, -1.0f, true);
 
 			// Destruir el enemigo
-			physB->listener->CleanUp();
+			auto enemy = dynamic_cast<Enemy*>(physB->listener);
+			enemy->pendingToDelete = true;
 			
 			dashed == false;
 		}
