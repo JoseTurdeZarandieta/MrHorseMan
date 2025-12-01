@@ -81,4 +81,5 @@ public:
 	// want our Entity class, maybe it's not renderable...
 	Vector2D position;       
 	bool renderable = true;
+	bool pendingToDelete = false;
 };

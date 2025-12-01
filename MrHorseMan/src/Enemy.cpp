@@ -8,6 +8,7 @@
 #include "Log.h"
 #include "EntityManager.h"
 #include "Map.h"
+#include "Player.h"
 
 
 
@@ -43,6 +44,11 @@ bool Enemy::Start() {
 	pbody->listener = this;
 	pbody->ctype = ColliderType::ENEMY;
 
+	pathfinding = std::make_shared<Pathfinding>();
+	Vector2D pos = GetPosition();	
+	Vector2D tilePos = Engine::GetInstance().map->WorldToMap((int)pos.getX(), (int)pos.getY() + 1);
+	pathfinding->ResetPath(tilePos);
+
 	if (patrolLeft == 0.0f && patrolRight == 0.0f) {
 		patrolLeft = position.getX() - 64.0f;
 		patrolRight = position.getX() + 64.0f;
@@ -53,6 +59,7 @@ bool Enemy::Start() {
 
 bool Enemy::Update(float dt) {
 
+	void PerformPathFinding();
 	anims.Update(dt);
 	const SDL_Rect& animFrame = anims.GetCurrentFrame();
 
@@ -69,6 +76,8 @@ bool Enemy::Update(float dt) {
 
 	if (x < patrolLeft)		direction = 1;
 	if (x > patrolRight)	direction = -1;
+
+	Vector2D pos = { (float)(x - texW / 2), (float)(y - texH / 2) };
 
 	Engine::GetInstance().render->DrawTexture(texture, x - texW / 2, y - texH / 2, &animFrame);
 
@@ -93,10 +102,28 @@ bool Enemy::CleanUp() {
 
 	LOG("Cleanup enemy");
 	Engine::GetInstance().textures->UnLoad(texture);
+	Engine::GetInstance().physics->DeletePhysBody(pbody);
 	return true;
 }
 
+void Enemy::PerformPathFinding() {
 
+	if (Engine::GetInstance().input.get()->GetKey(SDL_SCANCODE_M) == KEY_DOWN) {
+		pathfinding->PropagateAStar(SQUARED);
+	}
+
+	if (Engine::GetInstance().input.get()->GetKey(SDL_SCANCODE_M) == KEY_REPEAT &&
+		Engine::GetInstance().input.get()->GetKey(SDL_SCANCODE_LSHIFT) == KEY_REPEAT) {
+		pathfinding->PropagateAStar(SQUARED);
+	}
+}
+
+Vector2D Enemy::GetPosition() {
+	int x, y;
+	pbody->GetPosition(x, y);
+	// Adjust for center
+	return Vector2D((float)x - texW / 2, (float)y - texH / 2);
+}
 
 
 

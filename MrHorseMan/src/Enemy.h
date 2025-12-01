@@ -4,8 +4,14 @@
 #include <box2d/box2d.h>
 #include <SDL3/SDL.h>
 #include "Animation.h"
+#include "Pathfinding.h"
 
 struct SDL_Texture;
+
+enum enemyState {
+	PATROL,
+	CHASE
+};
 
 class Enemy : public Entity
 {
@@ -19,11 +25,13 @@ public:
 	bool Start();
 	bool Update(float dt);
 	bool CleanUp();
-
+	Vector2D GetPosition();
 	void OnCollision(PhysBody* physA, PhysBody* physB);
-	//void OnCollisionEnd(PhysBody* physA, PhysBody* physB);
-
 	void ResetToSpawn();
+	std::shared_ptr<Pathfinding> pathfinding;
+
+private:
+	void PerformPathFinding();
 
 public:
 	SDL_Texture* texture = NULL;
@@ -35,7 +43,9 @@ public:
 	int maxHealth = 50;
 	Vector2D spawnPos = { 96,96 };
 
-
+	bool playerOnRange;
+	int detectRange = 6;
+	enemyState state = PATROL;
 
 private:
 

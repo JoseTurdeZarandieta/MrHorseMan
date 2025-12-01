@@ -84,21 +84,7 @@ bool Scene::PreUpdate()
 
 bool Scene::Update(float dt)
 {
-	//L03 TODO 3: Make the camera movement independent of framerate
-	/*float camSpeed = 1;
-
-	if(Engine::GetInstance().input->GetKey(SDL_SCANCODE_UP) == KEY_REPEAT)
-		Engine::GetInstance().render->camera.y -= (int)ceil(camSpeed * dt);
-
-	if(Engine::GetInstance().input->GetKey(SDL_SCANCODE_DOWN) == KEY_REPEAT)
-		Engine::GetInstance().render->camera.y += (int)ceil(camSpeed * dt);
-
-	if(Engine::GetInstance().input->GetKey(SDL_SCANCODE_LEFT) == KEY_REPEAT)
-		Engine::GetInstance().render->camera.x -= (int)ceil(camSpeed * dt);
 	
-	if(Engine::GetInstance().input.get()->GetKey(SDL_SCANCODE_RIGHT) == KEY_REPEAT)
-		Engine::GetInstance().render.get()->camera.x += (int)ceil(camSpeed * dt);*/
-
 	return true;
 }
 
@@ -119,4 +105,10 @@ bool Scene::CleanUp()
 	LOG("Freeing scene");
 
 	return true;
+}
+
+// Return the player position
+Vector2D Scene::GetPlayerPosition()
+{
+    return player->GetPosition();
 }
