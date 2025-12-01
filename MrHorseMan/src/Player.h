@@ -93,7 +93,7 @@ private:
 	int jumpCount = 0;
 	int isRight = 1;
 	float currentTime = 0.0f;
-	float maxTime = 500.0f;
+	float maxTime = 300.0f;
 	float deltaTime = 0.0f;
 	float lastTime = 0.0f;
 	

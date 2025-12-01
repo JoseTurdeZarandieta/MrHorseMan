@@ -152,7 +152,7 @@ bool Player::Update(float dt)
 		b2Body_SetGravityScale(pbody->body, 0.0f); //desactiva gravedad
 		velocity.y = 0;
 		physics->SetLinearVelocity(pbody, { 0, 0 });
-		physics->ApplyLinearImpulseToCenter(pbody, 2.0f * isRight,0.0f, true);
+		physics->ApplyLinearImpulseToCenter(pbody, 3.0f * isRight,0.0f, true);
 	}
 
 	if (dashed == true) {
