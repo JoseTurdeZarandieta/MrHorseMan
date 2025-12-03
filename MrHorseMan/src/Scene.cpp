@@ -119,7 +119,7 @@ bool Scene::SaveGame()
     pugi::xml_node enemiesNode = root.append_child("enemies");
 
     int id = 0;
-    for (auto& e : Engine::GetInstance().entityManager->entities) // adjust to your container
+    for (auto& e : Engine::GetInstance().entityManager->entities)
     {
         if (e->type != EntityType::ENEMY) continue;
 
