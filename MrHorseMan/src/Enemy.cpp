@@ -79,7 +79,16 @@ bool Enemy::Update(float dt) {
 
 	Vector2D pos = { (float)(x - texW / 2), (float)(y - texH / 2) };
 
-	Engine::GetInstance().render->DrawTexture(texture, x - texW / 2, y - texH / 2, &animFrame);
+	//Engine::GetInstance().render->DrawTexture(texture, x - texW / 2, y - texH / 2, &animFrame);
+
+	SDL_Rect src = animFrame; // copia
+	if (direction == 1) {
+		// crear src flip horizontal invirtiendo la anchura (algunos motores caseros hacen flip con w negativo)
+		src.x = animFrame.x + animFrame.w - 1; // empezar por el extremo derecho del frame
+		src.w = -animFrame.w;                  // ancho negativo -> flip horizontal (si render lo soporta)
+	}
+	Engine::GetInstance().render->DrawTexture(texture, x - texW / 2, y - texH / 2, &src);
+
 
 	return true;
 }
