@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<game_state>
+	<player x="1879" y="320" />
+	<enemies>
+		<enemy id="0" x="1388.67004" y="298" dead="false" />
+		<enemy id="1" x="501.635986" y="1085.69995" dead="false" />
+	</enemies>
+</game_state>

@@ -32,6 +32,13 @@ public:
 	// Called before quitting
 	bool CleanUp();
 
+	bool SaveGame();
+	bool LoadGame();
+
+	Vector2D lastCheckpoint = { 0,0 };
+	bool hasCheckpoint = false;
+
+
 	Vector2D GetPlayerPosition();
 
 	std::string GetTilePosDebug() {
