@@ -137,6 +137,7 @@ public:
 
     // L07: TODO 8: Create a method that translates x,y coordinates from map positions to world positions
     Vector2D MapToWorld(int x, int y) const;
+    Vector2D WorldToMap(int x, int y);
 
     // L09: TODO 2: Implement function to the Tileset based on a tile id
     TileSet* GetTilesetFromTileId(int gid) const;
@@ -146,6 +147,17 @@ public:
 
 	// L10: TODO 7: Create a method to get the map size in pixels
 	Vector2D GetMapSizeInPixels();
+    Vector2D GetMapSizeInTiles();
+
+    MapLayer* GetNavigationLayer();
+
+    int GetTileWidth() {
+        return mapData.tileWidth;
+    }
+
+    int GetTileHeight() {
+        return mapData.tileHeight;
+    }
 
 public: 
     std::string mapFileName;

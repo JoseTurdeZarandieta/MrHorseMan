@@ -8,6 +8,7 @@
 #include "Log.h"
 #include "EntityManager.h"
 #include "Map.h"
+#include "Player.h"
 
 
 
@@ -30,18 +31,23 @@ bool Enemy::Awake() {
 
 bool Enemy::Start() {
 	spawnPos = position;
-	texture = Engine::GetInstance().textures->Load("Assets/Textures/BudEnem_spritesheet.png");
+	texture = Engine::GetInstance().textures->Load("Assets/Textures/rino_sprites.png");
 
-	std::unordered_map<int, std::string> animNames = { {0, "move"}/*, {5, "move"} */};
-	anims.LoadFromTSX("Assets/Textures/BudEnem_spritesheet.tsx", animNames);
+	std::unordered_map<int, std::string> animNames = { {1, "move"}/*, {5, "move"} */};
+	anims.LoadFromTSX("Assets/Textures/rino.tsx", animNames);
 	anims.SetCurrent("move");
 
-	texW = 32;
+	texW = 64;
 	texH = 32;
 	pbody = Engine::GetInstance().physics->CreateCircle((int)position.getX(), (int)position.getY(), texH / 2, bodyType::DYNAMIC);
 
 	pbody->listener = this;
 	pbody->ctype = ColliderType::ENEMY;
+
+	pathfinding = std::make_shared<Pathfinding>();
+	Vector2D pos = GetPosition();	
+	Vector2D tilePos = Engine::GetInstance().map->WorldToMap((int)pos.getX(), (int)pos.getY() + 1);
+	pathfinding->ResetPath(tilePos);
 
 	if (patrolLeft == 0.0f && patrolRight == 0.0f) {
 		patrolLeft = position.getX() - 64.0f;
@@ -53,8 +59,12 @@ bool Enemy::Start() {
 
 bool Enemy::Update(float dt) {
 
-	Physics* physics = Engine::GetInstance().physics.get();
+	void PerformPathFinding();
+	anims.Update(dt);
+	const SDL_Rect& animFrame = anims.GetCurrentFrame();
 
+	Physics* physics = Engine::GetInstance().physics.get();
+	
 	b2Vec2 velocity = physics->GetLinearVelocity(pbody);
 	velocity = { 0, velocity.y };
 
@@ -67,7 +77,9 @@ bool Enemy::Update(float dt) {
 	if (x < patrolLeft)		direction = 1;
 	if (x > patrolRight)	direction = -1;
 
-	Engine::GetInstance().render->DrawTexture(texture, x - texW / 2, y - texH / 2);
+	Vector2D pos = { (float)(x - texW / 2), (float)(y - texH / 2) };
+
+	Engine::GetInstance().render->DrawTexture(texture, x - texW / 2, y - texH / 2, &animFrame);
 
 	return true;
 }
@@ -90,10 +102,28 @@ bool Enemy::CleanUp() {
 
 	LOG("Cleanup enemy");
 	Engine::GetInstance().textures->UnLoad(texture);
+	Engine::GetInstance().physics->DeletePhysBody(pbody);
 	return true;
 }
 
+void Enemy::PerformPathFinding() {
 
+	if (Engine::GetInstance().input.get()->GetKey(SDL_SCANCODE_M) == KEY_DOWN) {
+		pathfinding->PropagateAStar(SQUARED);
+	}
+
+	if (Engine::GetInstance().input.get()->GetKey(SDL_SCANCODE_M) == KEY_REPEAT &&
+		Engine::GetInstance().input.get()->GetKey(SDL_SCANCODE_LSHIFT) == KEY_REPEAT) {
+		pathfinding->PropagateAStar(SQUARED);
+	}
+}
+
+Vector2D Enemy::GetPosition() {
+	int x, y;
+	pbody->GetPosition(x, y);
+	// Adjust for center
+	return Vector2D((float)x - texW / 2, (float)y - texH / 2);
+}
 
 
 

@@ -380,6 +380,13 @@ void PhysBody::GetPosition(int& x, int& y) const
     y = METERS_TO_PIXELS(pos.y);
 }
 
+void PhysBody::SetPosition(int x, int y)
+{
+    b2Vec2 pos = { PIXEL_TO_METERS(x), PIXEL_TO_METERS(y) };
+    b2Body_SetTransform(body, pos, b2MakeRot(0));
+    b2Body_SetAwake(body, true);
+}
+
 float PhysBody::GetRotation() const
 {
     b2Transform xf = b2Body_GetTransform(body);

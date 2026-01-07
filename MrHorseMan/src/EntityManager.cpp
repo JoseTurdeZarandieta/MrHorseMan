@@ -1,17 +1,18 @@
 #include "EntityManager.h"
+#include "Enemy.h"
 #include "Player.h"
 #include "Engine.h"
 #include "Textures.h"
 #include "Scene.h"
 #include "Log.h"
 #include "Item.h"
-#include "Enemy.h"
+#include "Entity.h"
 
 EntityManager::EntityManager() : Module()
 {
 	name = "entitymanager";
 }
-
+	
 // Destructor
 EntityManager::~EntityManager()
 {}
@@ -106,15 +107,31 @@ void EntityManager::resetEnemiesToSpwan() {
 	}
 }
 
-
-
 bool EntityManager::Update(float dt)
 {
 	bool ret = true;
+
+	//List to store entities pending deletion
+	std::list<std::shared_ptr<Entity>> pendingDelete;
+	
+	//Iterates over the entities and calls Update
 	for(const auto entity : entities)
 	{
+		//If the entity is marked for deletion, add it to the pendingDelete list
+		if (entity->pendingToDelete)
+		{
+			pendingDelete.push_back(entity);
+		}
+		//If the entity is not active, skip it
 		if (entity->active == false) continue;
 		ret = entity->Update(dt);
 	}
+
+	//Now iterates over the pendingDelete list and destroys the entities
+	for (const auto entity : pendingDelete)
+	{
+		DestroyEntity(entity);
+	}
+
 	return ret;
 }

@@ -1,4 +1,4 @@
-#include "Player.h"
+﻿#include "Player.h"
 #include "Engine.h"
 #include "Textures.h"
 #include "Audio.h"
@@ -10,6 +10,7 @@
 #include "EntityManager.h"
 #include "Map.h"
 #include "Item.h"
+#include "Enemy.h"
 
 Player::Player() : Entity(EntityType::PLAYER)
 {
@@ -47,7 +48,20 @@ bool Player::Start() {
 
 	pbody->ctype = ColliderType::PLAYER;
 
+	//Imagenes
+	controlsPNG = Engine::GetInstance().textures->Load("Assets/Textures/Controls.png");
+
+	//Audios
 	pickCoinFxId = Engine::GetInstance().audio->LoadFx("Assets/Audio/Fx/coin-collision-sound-342335.wav");
+	jump1FX = Engine::GetInstance().audio->LoadFx("Assets/Audio/Fx/1st jump.wav");
+	jump2FX = Engine::GetInstance().audio->LoadFx("Assets/Audio/Fx/2nd jump.wav");
+	walkingFX = Engine::GetInstance().audio->LoadFx("Assets/Audio/Fx/correr.wav");
+	gameOverFX = Engine::GetInstance().audio->LoadFx("Assets/Audio/Fx/game over.wav");
+	hitedFX = Engine::GetInstance().audio->LoadFx("Assets/Audio/Fx/hited.wav");
+	horseNeighFX = Engine::GetInstance().audio->LoadFx("Assets/Audio/Fx/horse-neigh.wav");
+	lvlFinishedFX = Engine::GetInstance().audio->LoadFx("Assets/Audio/Fx/level finished.wav");
+	dashFX = Engine::GetInstance().audio->LoadFx("Assets/Audio/Fx/dash.wav");
+	enemiDiedFx = Engine::GetInstance().audio->LoadFx("Assets/Audio/Fx/enemy_dead.wav");
 
 	return true;
 }
@@ -61,7 +75,15 @@ bool Player::Update(float dt)
 		Respawn();
 	}
 
+	if (Engine::GetInstance().input->GetKey(SDL_SCANCODE_F1) == KEY_DOWN && dashed == false && (isJumping == true || isGrounded == true)) {
+		Respawn();
+	}
 
+	if (Engine::GetInstance().input->GetKey(SDL_SCANCODE_H) == KEY_DOWN)
+	{
+		showControlsImage = !showControlsImage;   // Cambia estado ON/OFF
+		LOG("Toggling help image: %s", showControlsImage ? "ON" : "OFF");
+	}
 
 	// Read current velocity
 	b2Vec2 velocity = physics->GetLinearVelocity(pbody);
@@ -71,19 +93,19 @@ bool Player::Update(float dt)
 	//GodMode
 	if (Engine::GetInstance().input->GetKey(SDL_SCANCODE_F10) == KEY_DOWN) {
 		LOG("GodMode_Switched");
-		if (godMode == false) godMode = true;
-		if (godMode == true) godMode = false;
+
+		godMode = !godMode;
 	}
 
 	// Move left/right
-	if (Engine::GetInstance().input->GetKey(SDL_SCANCODE_A) == KEY_REPEAT) {
+	if (Engine::GetInstance().input->GetKey(SDL_SCANCODE_A) == KEY_REPEAT && dashing == false) {
 		velocity.x = -speed;
 		anims.SetCurrent("move");
 		flip = SDL_FLIP_HORIZONTAL; //flips the player's character when moving left
 		moving = true;
 		isRight = -1;
 	}
-	else if (Engine::GetInstance().input->GetKey(SDL_SCANCODE_D) == KEY_REPEAT) {
+	else if (Engine::GetInstance().input->GetKey(SDL_SCANCODE_D) == KEY_REPEAT && dashing == false) {
 		velocity.x = speed;
 		anims.SetCurrent("move");
 		flip = SDL_FLIP_NONE;
@@ -91,44 +113,88 @@ bool Player::Update(float dt)
 		isRight = 1;
 	}
 
-	// Move up/down
+	// Features godMode
 	if (godMode == true) {
 
-		if (Engine::GetInstance().input->GetKey(SDL_SCANCODE_W) == KEY_REPEAT) {
-			velocity.y = -speed;
+		if (Engine::GetInstance().input->GetKey(SDL_SCANCODE_UP) == KEY_REPEAT) {
+			velocity.y = -speed *2;
 			moving = true;
 		}
 
-		if (Engine::GetInstance().input->GetKey(SDL_SCANCODE_S) == KEY_REPEAT) {
-			velocity.y = +speed;
+		if (Engine::GetInstance().input->GetKey(SDL_SCANCODE_DOWN) == KEY_REPEAT) {
+			velocity.y = +speed*2;
 			moving = true;
 		}
+
+		if (Engine::GetInstance().input->GetKey(SDL_SCANCODE_LEFT) == KEY_REPEAT) {
+			velocity.x = -speed*2;
+			moving = true;
+		}
+
+		if (Engine::GetInstance().input->GetKey(SDL_SCANCODE_RIGHT) == KEY_REPEAT) {
+			velocity.x = +speed*2;
+			moving = true;
+		}
+
+		b2Body_SetGravityScale(pbody->body, 0.0f); //desactiva gravedad
+
 	}
 
 	//Dash															
 	if (Engine::GetInstance().input->GetKey(SDL_SCANCODE_S) == KEY_DOWN && dashed == false && (isJumping == true || isGrounded == true)) {
-		LOG("funciona");
-		dashed == true;
+		LOG("dash");
+		dashed = true;
+		dashing = true;
 		currentTime = 0.0f;
 
+		Engine::GetInstance().audio->PlayFx(dashFX);
 		b2Body_SetGravityScale(pbody->body, 0.0f); //desactiva gravedad
-		Engine::GetInstance().physics->SetLinearVelocity(pbody, {100.0f * isRight, 0.0f});
-
-		
+		velocity.y = 0;
+		physics->SetLinearVelocity(pbody, { 0, 0 });
+		physics->ApplyLinearImpulseToCenter(pbody, 3.0f * isRight,0.0f, true);
 	}
 
 	if (dashed == true) {
-		currentTime += deltaTime; // vas contando
-
+		currentTime += dt; // vas contando
+		LOG("dashing %f", currentTime);
 		if (currentTime >= maxTime) {
-			dashed = false;
 
 			b2Body_SetGravityScale(pbody->body, 1.0f); //activas gravedad
+			dashing = false;
+
+			// El dash ha terminado completamente
+			b2Vec2 endVel = physics->GetLinearVelocity(pbody);
+
+			// Si el jugador está pulsando A o D → retomar velocidad normal
+			if (Engine::GetInstance().input->GetKey(SDL_SCANCODE_A) == KEY_REPEAT)
+			{
+				endVel.x = -speed;
+			}
+			else if (Engine::GetInstance().input->GetKey(SDL_SCANCODE_D) == KEY_REPEAT)
+			{
+				endVel.x = speed;
+			}
+			else
+			{
+				// Si no pulsa nada -> quedas quieto horizontalmente
+				velocity.x = 0;
+			}
+
+			physics->SetLinearVelocity(pbody, endVel);
+
+			
 		}
 	}
 
 	// Jump (impulse once)
 	if (Engine::GetInstance().input->GetKey(SDL_SCANCODE_SPACE) == KEY_DOWN && jumpCount < maxJumps) {
+		if (jumpCount < 1) {
+			Engine::GetInstance().audio->PlayFx(jump1FX);
+		}
+		else if(jumpCount > 0){
+			Engine::GetInstance().audio->PlayFx(jump2FX);
+		}
+		
 		b2Vec2 vel = physics->GetLinearVelocity(pbody); 
 		vel.y = 0;
 		physics->SetLinearVelocity(pbody, vel); 
@@ -153,7 +219,9 @@ if (isJumping == true) {
 }
 
 // Apply velocity via helper
-physics->SetLinearVelocity(pbody, velocity);
+if (!dashing) {
+	physics->SetLinearVelocity(pbody, velocity);
+}
 
 if (health <= 0) {
 	Respawn();
@@ -185,6 +253,7 @@ if (position.getY() - limitUp > 0 && position.getY() < limitDown) {
 
 // L10: TODO 5: Draw the player using the texture and the current animation frame
 Engine::GetInstance().render->DrawTexture(texture, x - texW / 2, y - 1.5* texH, &animFrame, 1.0f, 0.0, INT_MAX, INT_MAX, flip);
+Engine::GetInstance().render->DrawTexture(texture, x - texW / 2, y - 1.5 * texH, &animFrame, 1.0f, 0.0, INT_MAX, INT_MAX, flip);
 
 //health screen display TODO NEXT TIME. THIS TIME, NO UI REQUIRED
 char hpText[32];
@@ -196,7 +265,19 @@ int posTextX = screenW - 120;
 int posTextY = margin;
 
 Engine::GetInstance().render->DrawText(hpText, posTextX, posTextY);
+if (showControlsImage && controlsPNG != nullptr)
+{
+	int camX = Engine::GetInstance().render->camera.x;
+	int camY = Engine::GetInstance().render->camera.y;
 
+	Engine::GetInstance().render->DrawTexture(
+		controlsPNG,
+		-camX + 50,   // posición en pantalla
+		-camY + 50,
+		nullptr,
+		1.0f
+	);
+}
 
 return true;
 }
@@ -205,6 +286,8 @@ bool Player::CleanUp()
 {
 	LOG("Cleanup player");
 	Engine::GetInstance().textures->UnLoad(texture);
+	Engine::GetInstance().textures->UnLoad(controlsPNG);
+	controlsPNG = nullptr;
 	return true;
 }
 
@@ -223,6 +306,10 @@ void Player::OnCollision(PhysBody* physA, PhysBody* physB) {
 		// Compute vertical and horizontal distance
 		float dy = py - by;
 		float dx = abs(px - bx);
+
+		if (dashed == true) {
+			b2Body_SetGravityScale(pbody->body, 1.0f);
+		}
 
 		// Only count as landing if the platform is below the player and horizontally aligned
 		if (dy < -texH / 2 && dx < texW) // platform below within tolerance
@@ -244,6 +331,8 @@ void Player::OnCollision(PhysBody* physA, PhysBody* physB) {
 		//reset the jump flag when touching the ground
 		isJumping = false;
 		isGrounded = true;
+		dashed = false;
+		dashing = false;
 		//L10: TODO 6: Update the animation based on the player's state
 		LOG("Collision PLATFORM");
 		break;
@@ -262,12 +351,45 @@ void Player::OnCollision(PhysBody* physA, PhysBody* physB) {
 		}
 		break;
 	case ColliderType::ENEMY:
-		TakeDamage(10);
-		LOG("Collision Enemy. Health %d", health);
+	{
+		int px, py;
+		int ex, ey;
+		pbody->GetPosition(px, py);
+		physB->GetPosition(ex, ey);
+
+		// Si la Y del player es MÁS ALTA que la del enemigo (player por encima)
+		bool playerAbove = py < ey - (texH / 4);  // margen para evitar colisiones laterales
+
+		if (playerAbove)
+		{
+			LOG("PLAYER HA PISADO AL ENEMIGO COMO UN CAMIÓN");
+			Engine::GetInstance().audio->PlayFx(enemiDiedFx);
+
+			// Rebote
+			Engine::GetInstance().physics->ApplyLinearImpulseToCenter(pbody, 0, -1.0f, true);
+
+			// Destruir el enemigo
+			auto enemy = dynamic_cast<Enemy*>(physB->listener);
+			enemy->pendingToDelete = true;
+			
+			dashed == false;
+		}
+		else
+		{
+
+			if (!godMode) {
+				TakeDamage(10);
+				LOG("Collision Enemy. Health %d", health);
+			}
+		}
 		break;
+	}
+
 	case ColliderType::DEATHZONE:
-		LOG("DeathZone hit. Respawning");
-		pendingRespawn = true;
+		if (!godMode) {
+			LOG("DeathZone hit. Respawning");
+			pendingRespawn = true;
+		}
 		break;
 	case ColliderType::UNKNOWN:
 		LOG("Collision UNKNOWN");
@@ -301,6 +423,17 @@ void Player::OnCollisionEnd(PhysBody* physA, PhysBody* physB)
 	}
 }
 
+Vector2D Player::GetPosition() {
+	int x, y;
+	pbody->GetPosition(x, y);
+	// Adjust for center
+	return Vector2D((float)x - texW / 2, (float)y - texH / 2);
+}
+
+void Player::SetPosition(Vector2D pos) {
+	pbody->SetPosition((int)(pos.getX() + texW / 2), (int)(pos.getY() + texH / 2));
+}
+
 void Player::TakeDamage(int amount) {
 	if (amount <= 0){
 		return;
@@ -317,6 +450,7 @@ void Player::HealToFull() {
 
 void Player::Respawn() {
 	HealToFull();
+	Engine::GetInstance().audio->PlayFx(horseNeighFX);
 
 	Physics* physics = Engine::GetInstance().physics.get();
 	physics->SetLinearVelocity(pbody, { 0,0 });
@@ -325,6 +459,8 @@ void Player::Respawn() {
 	position = spawnPos;
 	isJumping = false;
 	isGrounded = false;
+	dashed = false;
+	b2Body_SetGravityScale(pbody->body, 1.0f); //activas gravedad
 	jumpCount = 0;
 	maxDownwardSpeed = 0.0f;
 	anims.SetCurrent("idle");
