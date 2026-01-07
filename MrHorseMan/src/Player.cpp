@@ -192,8 +192,8 @@ snprintf(hpText, sizeof(hpText), "HP: %d", health);
 
 int screenW = Engine::GetInstance().render->camera.w;
 int margin = 12;
-int posTextX = -Engine::GetInstance().render->camera.w + (screenW - 100);
-int posTextY = Engine::GetInstance().render->camera.y + margin;
+int posTextX = screenW - 120;
+int posTextY = margin;
 
 Engine::GetInstance().render->DrawText(hpText, posTextX, posTextY);
 

@@ -295,7 +295,7 @@ bool Render::InitTTF(const char* fontPath, int ptSize) {
 		LOG("TTF_Init failed %s", SDL_GetError());
 		return false;
 	}
-	uiFont = TTF_OpenFont(fontPath, ptSize);
+	uiFont = TTF_OpenFont(fontPath, (float)ptSize);
 	if (!uiFont) {
 		LOG("TTF_OpenFont failed: %s", SDL_GetError()); //TTF_GetError works on sdl2, obsolete on sdl3
 		return false;
@@ -305,17 +305,29 @@ bool Render::InitTTF(const char* fontPath, int ptSize) {
 
 bool Render::DrawText(const char* text, int x, int y) {
 	if (!uiFont) return false;
+
 	SDL_Color white = { 255, 255, 255, 255 };
+
 	SDL_Surface* surf = TTF_RenderText_Blended(uiFont, text, SDL_strlen(text), white);
-	if (!surf) return false;
+	if (!surf) {
+		LOG("TTF_RenderText_Blended failed");
+		return false;
+	}
 	SDL_Texture* tex = SDL_CreateTextureFromSurface(renderer, surf);
-	if (!tex) return false;
+	if (!tex) {
+		SDL_DestroySurface(surf);
+		return false;
+	}
 
 	float width = 0, height = 0;
 	SDL_GetTextureSize(tex, &width, &height);
+
 	SDL_FRect dst{ (float)x, (float)y, width, height };
+
 	bool worksOk = SDL_RenderTexture(renderer, tex, nullptr, &dst);
 	SDL_DestroyTexture(tex);
+	SDL_DestroySurface(surf);
+
 	LOG("Works Ok");
 	return worksOk;
 }
