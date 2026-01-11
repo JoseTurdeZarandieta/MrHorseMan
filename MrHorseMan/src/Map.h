@@ -3,6 +3,7 @@
 #include "Module.h"
 #include <list>
 #include <vector>
+#include "Player.h"
 #include <unordered_map>
 
 // L09: TODO 5: Add attributes to the property structure
@@ -159,6 +160,11 @@ public:
         return mapData.tileHeight;
     }
 
+    //L15 TODO 2: Define a method to load entities from the map XML
+    void LoadEntities(std::shared_ptr<Player>& player);
+    //L15 TODO 4: Define a method to save entities to the map XML
+    void SaveEntities(std::shared_ptr<Player> player);
+
 public: 
     std::string mapFileName;
     std::string mapPath;
@@ -168,6 +174,10 @@ private:
     bool mapLoaded;
     // L06: DONE 1: Declare a variable data of the struct MapData
     MapData mapData;
+
+    pugi::xml_document mapFileXML;
+
+    std::list<PhysBody*> colliderList;
 
     std::unordered_map<std::string, std::vector<TiledObject>> objectLayers_;
 };

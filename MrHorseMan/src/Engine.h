@@ -19,6 +19,7 @@ class EntityManager;
 class Map;
 //L08 TODO 2: Add Physics module
 class Physics;
+class UIManager;
 
 class Engine
 {
@@ -105,7 +106,7 @@ public:
 	std::shared_ptr<Map> map;
 	// L08: TODO 2: Add Physics module
 	std::shared_ptr<Physics> physics;
-
+	std::shared_ptr<UIManager> uiManager;
 
 private: 
 
@@ -131,7 +132,6 @@ private:
 	int targetFrameRate = 60;
 	bool vsyncEnabled = false;
 	bool cap30 = false;
-
 
 	std::string gameTitle = "Mr HorseMan Game";
 
