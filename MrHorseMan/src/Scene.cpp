@@ -324,7 +324,7 @@ void Scene::LoadMainMenu() {
     //Engine::GetInstance().audio->PlayMusic("Assets/Audio/Music/retro-gaming-short-248416.wav");
 
     // Instantiate a UIButton in theScene
-    SDL_Rect btPos = { 1000, 350, 120,20 };
+    
     SDL_Rect btPos = { 520, 350, 120,20 };
     std::dynamic_pointer_cast<UIButton>(Engine::GetInstance().uiManager->CreateUIElement(UIElementType::BUTTON, 1, "MyButton", btPos, this));
 }
