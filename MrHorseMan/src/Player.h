@@ -4,7 +4,7 @@
 #include <box2d/box2d.h>
 #include <SDL3/SDL.h>
 #include "Animation.h"
-#include "Pathfinding.h"
+
 
 struct SDL_Texture;
 
@@ -75,8 +75,6 @@ public:
 	//Controls view
 	bool showControlsImage = false;
 	SDL_Texture* controlsPNG = nullptr;
-
-	std::shared_ptr<Pathfinding> pathfinding;
 
 private: 
 	b2Vec2 velocity;

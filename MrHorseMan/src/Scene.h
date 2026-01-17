@@ -62,6 +62,8 @@ public:
 	void UnloadCurrentScene();
 	void LoadScene(SceneID newScene);
 
+	SceneID GetCurrentScene();
+
 private:
 
 	// L17 TODO 3: Define specific function for main menu scene: Load, Unload, Handle UI events
@@ -80,8 +82,6 @@ private:
 	void LoadLevel2();
 	void UpdateLevel2(float dt);
 	void UnloadLevel2();
-
-private:
 
 	//L03: TODO 3b: Declare a Player attribute
 	std::shared_ptr<Player> player;

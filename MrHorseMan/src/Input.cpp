@@ -138,14 +138,25 @@ bool Input::GetWindowEvent(EventWindow ev)
 	return windowEvents[ev];
 }
 
-void Input::GetMousePosition(int& x, int& y)
+void Input::SetMousePosition(int& x, int& y)
 {
 	x = mouseX;
 	y = mouseY;
 }
 
-void Input::GetMouseMotion(int& x, int& y)
+void Input::SetMouseMotion(int& x, int& y)
 {
 	x = mouseMotionX;
 	y = mouseMotionY;
 }
+
+Vector2D Input::GetMousePosition()
+{
+	return Vector2D(mouseX, mouseY);
+}
+
+Vector2D Input::GetMouseMotion()
+{
+	return Vector2D(mouseMotionX, mouseMotionY);
+}
+

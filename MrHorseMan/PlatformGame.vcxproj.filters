@@ -90,6 +90,12 @@
     <ClCompile Include="src\EntityManager.cpp">
       <Filter>Source Files\Engine</Filter>
     </ClCompile>
+    <ClCompile Include="src\UIButton.cpp">
+      <Filter>Source Files\Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="src\UIManager.cpp">
+      <Filter>Source Files\Engine</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Engine.h">
@@ -156,6 +162,12 @@
       <Filter>Source Files\Engine</Filter>
     </ClInclude>
     <ClInclude Include="src\UIElement.h">
+      <Filter>Source Files\Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="src\UIButton.h">
+      <Filter>Source Files\Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="src\UIManager.h">
       <Filter>Source Files\Engine</Filter>
     </ClInclude>
   </ItemGroup>

@@ -321,9 +321,10 @@ void Scene::UnloadCurrentScene() {
 
 void Scene::LoadMainMenu() {
 
-    Engine::GetInstance().audio->PlayMusic("Assets/Audio/Music/retro-gaming-short-248416.wav");
+    //Engine::GetInstance().audio->PlayMusic("Assets/Audio/Music/retro-gaming-short-248416.wav");
 
-    // Instantiate a UIButton in the Scene
+    // Instantiate a UIButton in theScene
+    SDL_Rect btPos = { 1000, 350, 120,20 };
     SDL_Rect btPos = { 520, 350, 120,20 };
     std::dynamic_pointer_cast<UIButton>(Engine::GetInstance().uiManager->CreateUIElement(UIElementType::BUTTON, 1, "MyButton", btPos, this));
 }
@@ -418,7 +419,7 @@ void Scene::LoadLevel2() {
     Engine::GetInstance().audio->PlayMusic("Assets/Audio/Music/that-8-bit-music-322062.wav");
 
     //Call the function to load the map. 
-    Engine::GetInstance().map->Load("Assets/Maps/", "MapTemplateLevel2.tmx");
+    Engine::GetInstance().map->Load("Assets/Maps/", "SecondMap.tmx");
 
     //Call the function to load entities from the map
     Engine::GetInstance().map->LoadEntities(player);
@@ -443,4 +444,9 @@ void Scene::UnloadLevel2() {
     Engine::GetInstance().map->CleanUp();
     Engine::GetInstance().entityManager->CleanUp();
 
+}
+
+SceneID Scene::GetCurrentScene()
+{
+    return currentScene;
 }

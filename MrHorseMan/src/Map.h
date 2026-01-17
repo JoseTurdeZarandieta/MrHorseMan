@@ -4,7 +4,9 @@
 #include <list>
 #include <vector>
 #include "Player.h"
+#include <memory>
 #include <unordered_map>
+
 
 // L09: TODO 5: Add attributes to the property structure
 struct Properties

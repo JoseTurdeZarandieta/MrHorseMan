@@ -30,29 +30,30 @@ bool Enemy::Awake() {
 
 
 bool Enemy::Start() {
-	spawnPos = position;
-	texture = Engine::GetInstance().textures->Load("Assets/Textures/rino_sprites.png");
 
-	std::unordered_map<int, std::string> animNames = { {1, "move"}/*, {5, "move"} */};
-	anims.LoadFromTSX("Assets/Textures/rino.tsx", animNames);
-	anims.SetCurrent("move");
+		spawnPos = position;
+		texture = Engine::GetInstance().textures->Load("Assets/Textures/rino_sprites.png");
 
-	texW = 64;
-	texH = 32;
-	pbody = Engine::GetInstance().physics->CreateCircle((int)position.getX(), (int)position.getY(), texH / 2, bodyType::DYNAMIC);
+		std::unordered_map<int, std::string> animNames = { {1, "move"}/*, {5, "move"} */ };
+		anims.LoadFromTSX("Assets/Textures/rino.tsx", animNames);
+		anims.SetCurrent("move");
 
-	pbody->listener = this;
-	pbody->ctype = ColliderType::ENEMY;
+		texW = 64;
+		texH = 32;
+		pbody = Engine::GetInstance().physics->CreateCircle((int)position.getX(), (int)position.getY(), texH / 2, bodyType::DYNAMIC);
 
-	pathfinding = std::make_shared<Pathfinding>();
-	Vector2D pos = GetPosition();	
-	Vector2D tilePos = Engine::GetInstance().map->WorldToMap((int)pos.getX(), (int)pos.getY() + 1);
-	pathfinding->ResetPath(tilePos);
+		pbody->listener = this;
+		pbody->ctype = ColliderType::ENEMY;
 
-	if (patrolLeft == 0.0f && patrolRight == 0.0f) {
-		patrolLeft = position.getX() - 64.0f;
-		patrolRight = position.getX() + 64.0f;
-	}
+		pathfinding = std::make_shared<Pathfinding>();
+		Vector2D pos = GetPosition();
+		Vector2D tilePos = Engine::GetInstance().map->WorldToMap((int)pos.getX(), (int)pos.getY() + 1);
+		pathfinding->ResetPath(tilePos);
+
+		if (patrolLeft == 0.0f && patrolRight == 0.0f) {
+			patrolLeft = position.getX() - 64.0f;
+			patrolRight = position.getX() + 64.0f;
+		}
 
 	return true;
 }
