@@ -14,6 +14,7 @@
 #include "Physics.h"
 #include "Log.h"
 #include "UIManager.h"
+#include "Player.h"
 
 // Constructor
 Engine::Engine() {
@@ -38,6 +39,7 @@ Engine::Engine() {
     // L08: TODO 2: Add Physics module
     physics = std::make_shared<Physics>();
     scene = std::make_shared<Scene>();
+	player = std::make_shared<Player>();
     map = std::make_shared<Map>();
     entityManager = std::make_shared<EntityManager>();
     uiManager = std::make_shared<UIManager>();
@@ -52,6 +54,7 @@ Engine::Engine() {
     AddModule(std::static_pointer_cast<Module>(physics));
     AddModule(std::static_pointer_cast<Module>(map));
     AddModule(std::static_pointer_cast<Module>(scene));
+    AddModule(std::static_pointer_cast<Module>(player));
     AddModule(std::static_pointer_cast<Module>(entityManager));
     AddModule(std::static_pointer_cast<Module>(uiManager));
     // Render last 

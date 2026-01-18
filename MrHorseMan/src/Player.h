@@ -35,7 +35,7 @@ public:
 	void HealToFull();
 	void Respawn();
 
-	int GetHealth() const {
+	int GetHealth() {
 		return health;
 	}
 

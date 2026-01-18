@@ -89,9 +89,9 @@ private:
 	std::string tilePosDebug = "[0,0]";
 	bool once = false;
 
-		// L16: TODO 2: Declare a UIButton 
-	//std::shared_ptr<UIButton> uiBt;
-	//float volume = 1.0;
+	// L16: TODO 2: Declare a UIButton 
+	std::shared_ptr<UIButton> uiBt;
+	float volume = 1.0;
 
 	SceneID currentScene = SceneID::MAIN_MENU;
 };
