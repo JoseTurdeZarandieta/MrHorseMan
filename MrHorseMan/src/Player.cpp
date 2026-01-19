@@ -100,7 +100,6 @@ bool Player::Update(float dt)
 	// Move left/right
 	if (Engine::GetInstance().input->GetKey(SDL_SCANCODE_A) == KEY_REPEAT && dashing == false) {
 		velocity.x = -speed;
-		//L10: TODO 6: Update the animation based on the player's state
 		anims.SetCurrent("move");
 		flip = SDL_FLIP_HORIZONTAL; //flips the player's character when moving left
 		moving = true;
@@ -108,7 +107,6 @@ bool Player::Update(float dt)
 	}
 	else if (Engine::GetInstance().input->GetKey(SDL_SCANCODE_D) == KEY_REPEAT && dashing == false) {
 		velocity.x = speed;
-		//L10: TODO 6: Update the animation based on the player's state
 		anims.SetCurrent("move");
 		flip = SDL_FLIP_NONE;
 		moving = true;
@@ -257,6 +255,16 @@ if (position.getY() - limitUp > 0 && position.getY() < limitDown) {
 Engine::GetInstance().render->DrawTexture(texture, x - texW / 2, y - 1.5* texH, &animFrame, 1.0f, 0.0, INT_MAX, INT_MAX, flip);
 Engine::GetInstance().render->DrawTexture(texture, x - texW / 2, y - 1.5 * texH, &animFrame, 1.0f, 0.0, INT_MAX, INT_MAX, flip);
 
+//health screen display TODO NEXT TIME. THIS TIME, NO UI REQUIRED
+char hpText[32];
+snprintf(hpText, sizeof(hpText), "HP: %d", health);
+
+int screenW = Engine::GetInstance().render->camera.w;
+int margin = 12;
+int posTextX = screenW - 120;
+int posTextY = margin;
+
+Engine::GetInstance().render->DrawText(hpText, posTextX, posTextY);
 if (showControlsImage && controlsPNG != nullptr)
 {
 	int camX = Engine::GetInstance().render->camera.x;
