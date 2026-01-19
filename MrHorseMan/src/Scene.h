@@ -62,12 +62,14 @@ public:
 	void UnloadCurrentScene();
 	void LoadScene(SceneID newScene);
 
+
 	SceneID GetCurrentScene() const;
 
 	std::shared_ptr<Player> player;
 
 private:
 
+	void LoadSpawning();
 	// L17 TODO 3: Define specific function for main menu scene: Load, Unload, Handle UI events
 	void LoadMainMenu();
 	void UnloadMainMenu();
