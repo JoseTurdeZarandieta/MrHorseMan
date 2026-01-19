@@ -1,6 +1,7 @@
 #pragma once
 
 #include "UIElement.h"
+#include "EntityManager.h"
 #include "Vector2D.h"
 
 class UIHp : public UIElement

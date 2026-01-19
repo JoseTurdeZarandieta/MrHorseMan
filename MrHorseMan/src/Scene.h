@@ -62,7 +62,9 @@ public:
 	void UnloadCurrentScene();
 	void LoadScene(SceneID newScene);
 
-	SceneID GetCurrentScene();
+	SceneID GetCurrentScene() const;
+
+	std::shared_ptr<Player> player;
 
 private:
 
@@ -84,7 +86,7 @@ private:
 	void UnloadLevel2();
 
 	//L03: TODO 3b: Declare a Player attribute
-	std::shared_ptr<Player> player;
+	
 	SDL_Texture* mouseTileTex = nullptr;
 	std::string tilePosDebug = "[0,0]";
 	bool once = false;

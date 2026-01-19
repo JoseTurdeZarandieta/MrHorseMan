@@ -35,11 +35,9 @@ public:
 	void HealToFull();
 	void Respawn();
 
-	int GetHealth() {
+	int GetHealth() const{
 		return health;
 	}
-
-public:
 
 	//Declare player parameters
 	float speed = 5.0f;
