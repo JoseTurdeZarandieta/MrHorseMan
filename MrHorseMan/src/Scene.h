@@ -62,6 +62,10 @@ public:
 	void UnloadCurrentScene();
 	void LoadScene(SceneID newScene);
 
+	SceneID GetCurrentScene() const;
+
+	std::shared_ptr<Player> player;
+
 private:
 
 	// L17 TODO 3: Define specific function for main menu scene: Load, Unload, Handle UI events
@@ -81,17 +85,15 @@ private:
 	void UpdateLevel2(float dt);
 	void UnloadLevel2();
 
-private:
-
 	//L03: TODO 3b: Declare a Player attribute
-	std::shared_ptr<Player> player;
+	
 	SDL_Texture* mouseTileTex = nullptr;
 	std::string tilePosDebug = "[0,0]";
 	bool once = false;
 
-		// L16: TODO 2: Declare a UIButton 
-	//std::shared_ptr<UIButton> uiBt;
-	//float volume = 1.0;
+	// L16: TODO 2: Declare a UIButton 
+	std::shared_ptr<UIButton> uiBt;
+	float volume = 1.0;
 
 	SceneID currentScene = SceneID::MAIN_MENU;
 };

@@ -1,5 +1,6 @@
 #include "UIManager.h"
 #include "UIButton.h"
+#include "UIHp.h"
 #include "Engine.h"
 #include "Textures.h"
 #include "Audio.h"
@@ -26,6 +27,9 @@ std::shared_ptr<UIElement> UIManager::CreateUIElement(UIElementType type, int id
 	{
 	case UIElementType::BUTTON:
 		uiElement = std::make_shared<UIButton>(id, bounds, text);
+		break;
+	case UIElementType::HP:
+		uiElement = std::make_shared<UIHp>(id, bounds, text);
 		break;
 	}
 

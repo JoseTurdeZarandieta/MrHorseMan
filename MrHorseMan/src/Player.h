@@ -4,7 +4,7 @@
 #include <box2d/box2d.h>
 #include <SDL3/SDL.h>
 #include "Animation.h"
-#include "Pathfinding.h"
+
 
 struct SDL_Texture;
 
@@ -31,15 +31,17 @@ public:
 	Vector2D GetPosition();
 	void SetPosition(Vector2D pos);
 
+	void GodMode();
+	void Move();
+
+
 	void TakeDamage(int amount);
 	void HealToFull();
 	void Respawn();
 
-	int GetHealth() const {
+	int GetHealth() const{
 		return health;
 	}
-
-public:
 
 	//Declare player parameters
 	float speed = 5.0f;
@@ -75,8 +77,6 @@ public:
 	//Controls view
 	bool showControlsImage = false;
 	SDL_Texture* controlsPNG = nullptr;
-
-	std::shared_ptr<Pathfinding> pathfinding;
 
 private: 
 	b2Vec2 velocity;

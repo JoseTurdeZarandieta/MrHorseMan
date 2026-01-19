@@ -12,6 +12,7 @@
 #include "Item.h"
 #include "Enemy.h"
 
+
 Player::Player() : Entity(EntityType::PLAYER)
 {
 	name = "Player";
@@ -264,20 +265,6 @@ int margin = 12;
 int posTextX = screenW - 120;
 int posTextY = margin;
 
-Engine::GetInstance().render->DrawText(hpText, posTextX, posTextY);
-if (showControlsImage && controlsPNG != nullptr)
-{
-	int camX = Engine::GetInstance().render->camera.x;
-	int camY = Engine::GetInstance().render->camera.y;
-
-	Engine::GetInstance().render->DrawTexture(
-		controlsPNG,
-		-camX + 50,   // posición en pantalla
-		-camY + 50,
-		nullptr,
-		1.0f
-	);
-}
 
 return true;
 }

@@ -6,6 +6,7 @@
 #include "Log.h"
 #include "Physics.h"
 #include "EntityManager.h"
+#include "Player.h"
 
 #include <math.h>
 
