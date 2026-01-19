@@ -31,6 +31,10 @@ public:
 	Vector2D GetPosition();
 	void SetPosition(Vector2D pos);
 
+	void GodMode();
+	void Move();
+
+
 	void TakeDamage(int amount);
 	void HealToFull();
 	void Respawn();
