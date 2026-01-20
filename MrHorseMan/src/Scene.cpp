@@ -13,7 +13,7 @@
 #include "Item.h"
 #include "Enemy.h"
 #include "UIManager.h"
-//#include "UIHp.h"
+#include "UIHp.h"
 
 Scene::Scene() : Module()
 {
@@ -77,6 +77,16 @@ bool Scene::Update(float dt)
         LOG("Loading game...");
         LoadGame();
     }
+
+    if (currentScene != SceneID::MAIN_MENU)
+    {
+        SDL_Rect HPBounds = { 50, 50, 120,20 };
+
+        const char* playerHealth = std::to_string (Engine::GetInstance().scene->player->GetHealth()).c_str();
+		LOG("Player HP: %s", playerHealth);
+        std::dynamic_pointer_cast<UIHp>(Engine::GetInstance().uiManager->CreateUIElement(UIElementType::HP, 10, playerHealth, HPBounds, this));
+	}
+
     return true;
 }
 
@@ -324,9 +334,10 @@ void Scene::LoadMainMenu() {
     // Instantiate a UIButton in theScene
     
     Engine::GetInstance().map->Load("Assets/Maps/", "MainMenu.tmx");
+
     SDL_Rect btPos = { 520, 350, 120,20 };
     std::dynamic_pointer_cast<UIButton>(Engine::GetInstance().uiManager->CreateUIElement(UIElementType::BUTTON, 1, "Start Game", btPos, this));
-	LOG("Main Menu CREATED");
+    LOG("Main Menu CREATED");
 }
 
 void Scene::UnloadMainMenu() {
@@ -375,6 +386,10 @@ void Scene::LoadLevel1() {
 }
 
 void Scene::UpdateLevel1(float dt) {
+
+
+
+    
 
     if (Engine::GetInstance().input->GetKey(SDL_SCANCODE_2) == KEY_DOWN) {
         ChangeScene(SceneID::LEVEL2);

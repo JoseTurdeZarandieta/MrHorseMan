@@ -22,23 +22,10 @@ UIHp::~UIHp()
 
 bool UIHp::Update(float dt)
 {
-	if (Engine::GetInstance().scene->GetCurrentScene() == SceneID::MAIN_MENU) {
-		state = UIElementState::DISABLED;
+	Engine::GetInstance().render->DrawRectangle(bounds, 0, 0, 20, 255, true, false);
+	Engine::GetInstance().render->DrawText(text.c_str(), bounds.x, bounds.y, bounds.w, bounds.h, { 255,255,255,255 });
 
-	}
-	else if (Engine::GetInstance().scene->GetCurrentScene() == SceneID::LEVEL1 || Engine::GetInstance().scene->GetCurrentScene() == SceneID::LEVEL2) {
-		state = UIElementState::NORMAL;
-	}
-	if (state == UIElementState::DISABLED) {
-		return false;
-	}
-	if (state == UIElementState::NORMAL) {
-		int currentHp = Engine::GetInstance().scene->player->health;
-		const char* currentHpStr = std::to_string(currentHp).c_str();
-		Engine::GetInstance().render->DrawText( currentHpStr, bounds.x, bounds.y, bounds.w, bounds.h, { 255,255,255,255 });
-	}
-
-	return false;
+	return true;
 }
 
 bool UIHp::CleanUp()

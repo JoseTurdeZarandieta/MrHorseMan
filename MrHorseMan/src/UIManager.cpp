@@ -42,6 +42,25 @@ std::shared_ptr<UIElement> UIManager::CreateUIElement(UIElementType type, int id
 	return uiElement;
 }
 
+//std::shared_ptr<UIElement> UIManager::CreateUIHPElement(UIElementType type, int id, int text, SDL_Rect bounds, Module* observer)
+//{
+//	std::shared_ptr<UIElement> uiElement = std::make_shared<UIElement>();
+//	switch (type)
+//	{
+//	case UIElementType::HP:
+//		uiElement = std::make_shared<UIHp>(id, bounds, text);
+//		break;
+//	}
+//
+//	//Set the observer
+//	uiElement->observer = observer;
+//
+//	// Created GuiControls are add it to the list of controls
+//	UIElementsList.push_back(uiElement);
+//
+//	return uiElement;
+//}
+
 bool UIManager::Update(float dt)
 {	
 	//List to store entities pending deletion

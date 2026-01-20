@@ -26,6 +26,7 @@ public:
 
 	// Additional methods
 	std::shared_ptr<UIElement> CreateUIElement(UIElementType type, int id, const char* text, SDL_Rect bounds, Module* observer, SDL_Rect sliderBounds = { 0,0,0,0 });
+	std::shared_ptr<UIElement> CreateUIHPElement(UIElementType type, int id, int text, SDL_Rect bounds, Module* observer);
 
 public:
 

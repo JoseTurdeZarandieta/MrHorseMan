@@ -21,10 +21,10 @@ public:
 	int currentHp;
 	int previousHp = maxHp;
 
-	SDL_Rect hpFullBarRect;
-	SDL_Rect hpRedBarRect;
-	SDL_Color redColor = { 255, 0, 0, 255 };
-	SDL_Color grayColor = { 100, 100, 100, 255 };
+	//SDL_Rect hpFullBarRect;
+	//SDL_Rect hpRedBarRect;
+	//SDL_Color redColor = { 255, 0, 0, 255 };
+	//SDL_Color grayColor = { 100, 100, 100, 255 };
 
 	bool HpUpdate(int currentHp, int maxHp, int previousHp);
 
