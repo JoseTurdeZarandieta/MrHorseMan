@@ -51,6 +51,7 @@ public:
 	void ToggleVSync();
 	void Toggle30FpsCap();
 
+	int frameCount = 0;
 
 private:
 
@@ -123,7 +124,7 @@ private:
 	PerfTimer frameTime;
 	PerfTimer lastSecFrameTime;
 
-	int frameCount = 0;
+	
 	int framesPerSecond = 0;
 	int lastSecFrameCount = 0;
 

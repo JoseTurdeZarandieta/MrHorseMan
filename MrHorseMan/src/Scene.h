@@ -62,6 +62,7 @@ public:
 	void UnloadCurrentScene();
 	void LoadScene(SceneID newScene);
 
+	void uiHpBox();
 
 	SceneID GetCurrentScene() const;
 

@@ -77,17 +77,27 @@ bool Scene::Update(float dt)
         LOG("Loading game...");
         LoadGame();
     }
-
     if (currentScene != SceneID::MAIN_MENU)
-    {
-        SDL_Rect HPBounds = { 50, 50, 120,20 };
-
-        const char* playerHealth = std::to_string (Engine::GetInstance().scene->player->GetHealth()).c_str();
-		LOG("Player HP: %s", playerHealth);
-        std::dynamic_pointer_cast<UIHp>(Engine::GetInstance().uiManager->CreateUIElement(UIElementType::HP, 10, playerHealth, HPBounds, this));
-	}
+        uiHpBox();
 
     return true;
+}
+
+void Scene::uiHpBox() {
+        int currentHP;
+        SDL_Rect HPBounds = { 50, 50, 120,20 };
+        const char* playerHealth = std::to_string(Engine::GetInstance().scene->player->GetHealth()).c_str();;
+
+        if (Engine::GetInstance().scene->player->maxHealth = 100)               currentHP = Engine::GetInstance().scene->player->maxHealth;
+
+        if (currentHP != Engine::GetInstance().scene->player->GetHealth())
+        {
+            playerHealth = std::to_string(Engine::GetInstance().scene->player->GetHealth()).c_str();
+            std::dynamic_pointer_cast<UIHp>(Engine::GetInstance().uiManager->CreateUIElement(UIElementType::HP, 10, playerHealth, HPBounds, this));
+            LOG("Player HP: %d", currentHP);
+            currentHP = Engine::GetInstance().scene->player->GetHealth();
+        }
+
 }
 
 
@@ -386,11 +396,7 @@ void Scene::LoadLevel1() {
 }
 
 void Scene::UpdateLevel1(float dt) {
-
-
-
-    
-
+  
     if (Engine::GetInstance().input->GetKey(SDL_SCANCODE_2) == KEY_DOWN) {
         ChangeScene(SceneID::LEVEL2);
     }
