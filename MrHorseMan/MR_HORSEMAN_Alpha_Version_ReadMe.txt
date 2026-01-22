@@ -1,4 +1,4 @@
- 		- - MR HORSEMAN Alpha-Version - -
+ 		- - MR HORSEMAN v0.3-Version - -
 GITHUB - - - https://github.com/JoseTurdeZarandieta/MrHorseMan
 
 TEAM MEMBERS:
@@ -6,20 +6,22 @@ TEAM MEMBERS:
  - DAVID GARCÍA CASTRO
  - JOSÉ TUR DE ZARANDIETA
 
-Game Description: Mr Horseman is a game about the bizarre adventures of the Horse who developed a human side. 
+Game Description: Mr Horseman is a game about the bizarre adventures of the Giraffe who developed a human side. 
 
 How to play:
 
 - A / D to move left/right
 - Spacebar to jump
+- dash
 - F9 toggles collision view
 - F10 toggles FPS cap
 - F12 toggles Vsync
 
-Implemented features in Alpha-version:
+Implemented features in v0.3-version:
 
 - Jump and Double-Jump
-- Enemies and enemy damage
+- Enemies and enemy damage; killing enemies
 - Fall damage
 - DeathZones
-- Item collection
+- Item collection + points
+- next level (breaks)
