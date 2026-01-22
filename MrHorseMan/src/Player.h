@@ -41,6 +41,10 @@ public:
 		return health;
 	}
 
+	int GetPoints() const {
+		return points;
+	}
+
 	//Declare player parameters
 	float speed = 5.0f;
 	SDL_Texture* texture = NULL;
@@ -70,6 +74,7 @@ public:
 	int respawnCounter;
 
 	int health = 100;
+	int points = 0;
 	int previousHealth = 100;
 	int maxHealth = 100;
 	Vector2D spawnPos;

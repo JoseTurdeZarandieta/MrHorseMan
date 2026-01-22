@@ -105,7 +105,7 @@ bool Scene::Update(float dt)
 void Scene::uiHpBox() {
 
     SDL_Rect HPBounds = { 50, 50, 90,30 };
-    SDL_Rect TextBounds = { 100, 50, 120,20 };
+
 
     if (currentHP != Engine::GetInstance().scene->player->GetHealth()) {
         currentHP = Engine::GetInstance().scene->player->GetHealth();
@@ -114,7 +114,17 @@ void Scene::uiHpBox() {
 
     }
 }
+void Scene::uiPointsBox() {
 
+    SDL_Rect TextBounds = { 300, 50, 120,20 };
+
+    if (currentpoints != Engine::GetInstance().scene->player->GetPoints()) {
+        currentpoints = Engine::GetInstance().scene->player->GetPoints();
+        std::string hpText = "Points: " + std::to_string(Engine::GetInstance().scene->player->GetPoints());
+        std::dynamic_pointer_cast<UIHp>(Engine::GetInstance().uiManager->CreateUIHPElement(UIHPElementType::HP, 0, hpText.c_str(), 1, TextBounds, this));
+
+    }
+}
 
 
 

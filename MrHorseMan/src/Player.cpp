@@ -288,6 +288,7 @@ void Player::OnCollision(PhysBody* physA, PhysBody* physB) {
 	
 	if (OnCollisionCounter = 0) {
 		Engine::GetInstance().scene->uiHpBox();
+		Engine::GetInstance().scene->uiPointsBox();
 		LOG("UIHPBOX ONCOLLISION");
 	}
 
@@ -368,6 +369,8 @@ void Player::OnCollision(PhysBody* physA, PhysBody* physB) {
 			auto enemy = dynamic_cast<Enemy*>(physB->listener);
 			enemy->pendingToDelete = true;
 			
+			points += 100;
+
 			dashed == false;
 		}
 		else
@@ -381,6 +384,7 @@ void Player::OnCollision(PhysBody* physA, PhysBody* physB) {
 				LOG("Collision Enemy. Health %d", health);
 			}
 		}
+		Engine::GetInstance().scene->uiPointsBox();
 		break;
 	}
 

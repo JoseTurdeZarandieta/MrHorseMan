@@ -64,7 +64,9 @@ public:
 	void LoadScene(SceneID newScene);
 
 	void uiHpBox();
+	void uiPointsBox();
 	int currentHP = 101;
+	int currentpoints = -1;
 
 	SceneID GetCurrentScene() const;
 
