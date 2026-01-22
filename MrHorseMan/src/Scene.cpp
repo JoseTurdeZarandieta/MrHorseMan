@@ -15,6 +15,7 @@
 #include "UIManager.h"
 #include "UIHp.h"
 
+
 Scene::Scene() : Module()
 {
 	name = "scene";
@@ -77,26 +78,31 @@ bool Scene::Update(float dt)
         LOG("Loading game...");
         LoadGame();
     }
-    if (currentScene != SceneID::MAIN_MENU)
-        uiHpBox();
+
+    // -------- HEAL TO FULLL (F2) ----------
+    if (input->GetKey(SDL_SCANCODE_F2) == KEY_DOWN)
+    {
+        LOG("Healing to full...");
+		Engine::GetInstance().scene->player->HealToFull();
+		LOG("Player health: %d", Engine::GetInstance().scene->player->GetHealth());
+    }
 
     return true;
 }
 
 void Scene::uiHpBox() {
-        int currentHP;
+        
         SDL_Rect HPBounds = { 50, 50, 120,20 };
-        const char* playerHealth = std::to_string(Engine::GetInstance().scene->player->GetHealth()).c_str();;
+        SDL_Rect TextBounds = { 100, 50, 120,20 };
 
-        if (Engine::GetInstance().scene->player->maxHealth = 100)               currentHP = Engine::GetInstance().scene->player->maxHealth;
-
-        if (currentHP != Engine::GetInstance().scene->player->GetHealth())
-        {
-            playerHealth = std::to_string(Engine::GetInstance().scene->player->GetHealth()).c_str();
-            std::dynamic_pointer_cast<UIHp>(Engine::GetInstance().uiManager->CreateUIElement(UIElementType::HP, 10, playerHealth, HPBounds, this));
-            LOG("Player HP: %d", currentHP);
-            currentHP = Engine::GetInstance().scene->player->GetHealth();
-        }
+        if (currentHP != Engine::GetInstance().scene->player->GetHealth()) {
+			currentHP = Engine::GetInstance().scene->player->GetHealth();
+            playerHealth = std::to_string(currentHP).c_str();
+			//std::string playerHealth = std::to_string(currentHP);
+			//char const* cstr = playerHealth.c_str();
+		}
+        //std::dynamic_pointer_cast<UIHp>(Engine::GetInstance().uiManager->CreateUIElement(UIElementType::HP, 10, "HP: ", HPBounds, this));
+        std::dynamic_pointer_cast<UIHp>(Engine::GetInstance().uiManager->CreateUIHPElement(UIHPElementType::HP, 0, "HP: %d", currentHP, HPBounds, this));
 
 }
 

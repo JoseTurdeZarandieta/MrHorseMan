@@ -28,9 +28,9 @@ std::shared_ptr<UIElement> UIManager::CreateUIElement(UIElementType type, int id
 	case UIElementType::BUTTON:
 		uiElement = std::make_shared<UIButton>(id, bounds, text);
 		break;
-	case UIElementType::HP:
+	/*case UIElementType::HP:
 		uiElement = std::make_shared<UIHp>(id, bounds, text);
-		break;
+		break;*/
 	}
 
 	//Set the observer
@@ -42,24 +42,27 @@ std::shared_ptr<UIElement> UIManager::CreateUIElement(UIElementType type, int id
 	return uiElement;
 }
 
-//std::shared_ptr<UIElement> UIManager::CreateUIHPElement(UIElementType type, int id, int text, SDL_Rect bounds, Module* observer)
-//{
-//	std::shared_ptr<UIElement> uiElement = std::make_shared<UIElement>();
-//	switch (type)
-//	{
-//	case UIElementType::HP:
-//		uiElement = std::make_shared<UIHp>(id, bounds, text);
-//		break;
-//	}
-//
-//	//Set the observer
-//	uiElement->observer = observer;
-//
-//	// Created GuiControls are add it to the list of controls
-//	UIElementsList.push_back(uiElement);
-//
-//	return uiElement;
-//}
+std::shared_ptr<UIHPElement> UIManager::CreateUIHPElement(UIHPElementType type, int id, const char* text, int number, SDL_Rect bounds, Module* observer, SDL_Rect sliderBounds)
+{
+	std::shared_ptr<UIHPElement> uiHPElement = std::make_shared<UIHPElement>();
+
+
+	switch (type)
+	{
+
+	case UIHPElementType::HP:
+		uiHPElement = std::make_shared<UIHp>(id, bounds, text, number);
+		break;
+	}
+
+	//Set the observer
+	uiHPElement->HPobserver = observer;
+
+	// Created GuiControls are add it to the list of controls
+	UIHPElementsList.push_back(uiHPElement);
+
+	return uiHPElement;
+}
 
 bool UIManager::Update(float dt)
 {	
@@ -85,6 +88,30 @@ bool UIManager::Update(float dt)
 		UIElementsList.remove(uiElement);
 	}
 
+	/*---- ----- ---- ---- UI HP ---- ---- ---- ---- ----*/
+	std::list<std::shared_ptr<UIHPElement>> HPpendingDelete;
+
+	for (const auto& uiHPElement : UIHPElementsList)
+	{
+		//If the entity is marked for deletion, add it to the pendingDelete list
+		if (uiHPElement->HPpendingToDelete)
+		{
+			HPpendingDelete.push_back(uiHPElement);
+		}
+		else {
+			uiHPElement->Update(dt);
+		}
+	}
+
+	//Now iterates over the pendingDelete list and destroys the uiElement
+	for (const auto uiHPElement : HPpendingDelete)
+	{
+		uiHPElement->CleanUp();
+		UIHPElementsList.remove(uiHPElement);
+	}
+
+
+
 	return true;
 }
 
@@ -93,6 +120,11 @@ bool UIManager::CleanUp()
 	for (const auto& uiElement : UIElementsList)
 	{
 		uiElement->CleanUp();
+	}
+
+	for (const auto& uiHPElement : UIHPElementsList)
+	{
+		uiHPElement->CleanUp();
 	}
 
 	return true;

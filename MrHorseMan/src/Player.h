@@ -31,13 +31,11 @@ public:
 	Vector2D GetPosition();
 	void SetPosition(Vector2D pos);
 
-	void GodMode();
-	void Move();
-
-
 	void TakeDamage(int amount);
 	void HealToFull();
 	void Respawn();
+
+
 
 	int GetHealth() const{
 		return health;
@@ -48,6 +46,8 @@ public:
 	SDL_Texture* texture = NULL;
 
 	int texW, texH;
+
+	int OnCollisionCounter = 0;
 
 	//Audio fx
 	int pickCoinFxId;
@@ -69,8 +69,9 @@ public:
 	bool pendingRespawn = false;
 
 	int health = 100;
+	int previousHealth = 100;
 	int maxHealth = 100;
-	Vector2D spawnPos = { 96,96 };
+	Vector2D spawnPos;
 	float fallSpeedDamageThreshold = 10.0f;
 	float fallSpeedMax = 25.0f;
 
@@ -101,7 +102,6 @@ private:
 	float dashTimer = 0.0f;
 	float dashSpeed = 100.0f;   // velocidad horizontal
 	int dashDirection = 1;      // 1 = derecha, -1 = izquierda
-	
 
 	const int maxJumps = 2; // 1 ground + 1 air (double jump)
 };

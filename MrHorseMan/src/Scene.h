@@ -63,6 +63,7 @@ public:
 	void LoadScene(SceneID newScene);
 
 	void uiHpBox();
+	int currentHP = 101;
 
 	SceneID GetCurrentScene() const;
 
@@ -99,4 +100,6 @@ private:
 	float volume = 1.0;
 
 	SceneID currentScene = SceneID::MAIN_MENU;
+
+	const char* playerHealth;
 };
