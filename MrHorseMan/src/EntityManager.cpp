@@ -118,9 +118,6 @@ void EntityManager::resetLevelToSpwan() {
 		if (entity->type == EntityType::ChangeLevel)
 			static_cast<ChangeLevel*>(entity.get())->ResetToSpawn();
 	}
-	for (auto& entity : entities) {
-
-	}
 }
 
 

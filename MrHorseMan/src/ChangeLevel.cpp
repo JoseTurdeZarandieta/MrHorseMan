@@ -26,7 +26,7 @@ bool ChangeLevel::Start() {
 	spawnPos = position;
 
 	//initilize textures
-	texture = Engine::GetInstance().textures->Load("Assets/Textures/goldCoin.png");
+	texture = Engine::GetInstance().textures->Load("Assets/Textures/Doors.png");
 	
 	Engine::GetInstance().textures.get()->GetSize(texture, texW, texH);
 	pbody = Engine::GetInstance().physics->CreateCircle((int)position.getX() + texH / 2, (int)position.getY() + texH / 2, texH / 2, bodyType::STATIC);

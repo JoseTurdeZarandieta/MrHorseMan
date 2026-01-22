@@ -232,6 +232,26 @@ bool Map::Load(std::string path, std::string fileName)
                     pbody->ctype = ColliderType::DEATHZONE;
                 }
             }
+            auto l2 = objectLayers_.find("TriggerForLevel2");
+            if (l2 != objectLayers_.end()) {
+                for (const auto& origin : l2->second) {
+                    float centerx = origin.x + origin.width * 0.5f;
+                    float centery = origin.y + origin.height * 0.5f;
+
+                    PhysBody* pbody = Engine::GetInstance().physics->CreateRectangleSensor(centerx, centery, origin.width, origin.height, STATIC);
+                    pbody->ctype = ColliderType::CHANGELEVEL_TRIGGER1;
+                }
+            }
+            auto end = objectLayers_.find("TriggerForEnd");
+            if (end != objectLayers_.end()) {
+                for (const auto& origin : end->second) {
+                    float centerx = origin.x + origin.width * 0.5f;
+                    float centery = origin.y + origin.height * 0.5f;
+
+                    PhysBody* pbody = Engine::GetInstance().physics->CreateRectangleSensor(centerx, centery, origin.width, origin.height, STATIC);
+                    pbody->ctype = ColliderType::CHANGELEVEL_TRIGGER2;
+                }
+            }
         }
 
 

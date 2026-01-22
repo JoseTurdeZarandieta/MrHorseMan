@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.0" orientation="orthogonal" renderorder="right-down" width="88" height="59" tilewidth="32" tileheight="32" infinite="0" nextlayerid="16" nextobjectid="89">
+<map version="1.10" tiledversion="1.11.0" orientation="orthogonal" renderorder="right-down" width="88" height="59" tilewidth="32" tileheight="32" infinite="0" nextlayerid="17" nextobjectid="94">
  <properties>
   <property name="Draw" type="bool" value="true"/>
  </properties>
@@ -82,6 +82,7 @@
  <tileset firstgid="2605" name="arrows" tilewidth="32" tileheight="32" tilecount="4" columns="2">
   <image source="arrows.png" width="64" height="64"/>
  </tileset>
+ <tileset firstgid="2609" source="doors.tsx"/>
  <layer id="11" name="Fondo" width="88" height="59">
   <properties>
    <property name="Draw" type="bool" value="true"/>
@@ -26099,6 +26100,9 @@
    </properties>
    <point/>
   </object>
+ </objectgroup>
+ <objectgroup id="16" name="TriggerForEnd">
+  <object id="89" x="2592" y="1760" width="128" height="64"/>
  </objectgroup>
  <objectgroup id="15" name="DeathZones">
   <object id="20" x="1740" y="1806.67" width="233.333" height="32"/>

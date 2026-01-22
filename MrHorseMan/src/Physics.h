@@ -31,6 +31,8 @@ enum class ColliderType {
     ENEMY,
     DEATHZONE,
     CHANGELEVEL,
+    CHANGELEVEL_TRIGGER1,
+	CHANGELEVEL_TRIGGER2,
     UNKNOWN
     // ..
 };

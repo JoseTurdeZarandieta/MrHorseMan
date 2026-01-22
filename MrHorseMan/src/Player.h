@@ -67,7 +67,7 @@ public:
 	bool isJumping = false; // Flag to check if the player is currently jumping
 
 	bool pendingRespawn = false;
-	int respawnCounter = 0;
+	int respawnCounter;
 
 	int health = 100;
 	int previousHealth = 100;

@@ -30,10 +30,11 @@ bool Player::Awake() {
 
 	Physics* physics = Engine::GetInstance().physics.get();
 	//L03: TODO 2: Initialize Player parameters
-	position = Vector2D(1000, 102);
+	position = Vector2D(80, 201);
 	spawnPos = position;
 	health = maxHealth;
 	pendingRespawn = false;
+	respawnCounter = 0;
 	return true;
 }
 
@@ -80,13 +81,13 @@ bool Player::Update(float dt)
 	if (pendingRespawn == true) {
 		pendingRespawn = false;
 		Respawn();
-		respawnCounter++;
+		respawnCounter = respawnCounter +1;
 	}
-	if (respawnCounter = 1) {
-		//Engine::GetInstance().scene->LoadScene(SceneID::LEVEL1);
-		LOG("Respawning Player at spawn point");
-		respawnCounter++;
-	}
+	//if (respawnCounter = 1) {
+	//	//Engine::GetInstance().scene->LoadScene(SceneID::LEVEL1);
+	//	LOG("Respawning Player at spawn point");
+	//	respawnCounter = respawnCounter+1;
+	//}
 
 	if (Engine::GetInstance().input->GetKey(SDL_SCANCODE_H) == KEY_DOWN)
 	{
@@ -395,7 +396,17 @@ void Player::OnCollision(PhysBody* physA, PhysBody* physB) {
 
 			physB->listener->Destroy();
 		}
-
+		break;
+	case ColliderType::CHANGELEVEL_TRIGGER1:
+		LOG("Collision CHANGELEVEL TRIGGER1");
+		Engine::GetInstance().scene->UnloadCurrentScene();
+		Engine::GetInstance().scene->ChangeScene(SceneID::LEVEL2);
+		break;
+	case ColliderType::CHANGELEVEL_TRIGGER2:
+		LOG("Collision CHANGELEVEL TRIGGER2");
+		Engine::GetInstance().scene->UnloadCurrentScene();
+		Engine::GetInstance().scene->ChangeScene(SceneID::END_MENU);
+		break;
 	case ColliderType::UNKNOWN:
 		LOG("Collision UNKNOWN");
 		break;
@@ -422,6 +433,12 @@ void Player::OnCollisionEnd(PhysBody* physA, PhysBody* physB)
 		break;
 	case ColliderType::DEATHZONE:
 		LOG("End Collision DEATHZONE");
+		break;
+	case ColliderType::CHANGELEVEL_TRIGGER1:
+		LOG("End Collision CHANGELEVEL_TRIGGER1");
+		break;
+	case ColliderType::CHANGELEVEL_TRIGGER2:
+		LOG("End Collision CHANGELEVEL_TRIGGER2");
 		break;
 	case ColliderType::CHANGELEVEL:
 		LOG("End Collision CHANGELEVEL");
@@ -460,6 +477,7 @@ void Player::HealToFull() {
 }
 
 void Player::Respawn() {
+	Engine::GetInstance().scene->ChangeScene(SceneID::LEVEL1);
 	HealToFull();
 	Engine::GetInstance().audio->PlayFx(horseNeighFX);
 

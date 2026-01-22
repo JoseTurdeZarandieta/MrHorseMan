@@ -95,7 +95,7 @@ bool Scene::Update(float dt)
     }
     if (input->GetKey(SDL_SCANCODE_F3) == KEY_DOWN)
     {
-		Engine::GetInstance().scene->player->Respawn();
+        Engine::GetInstance().scene->player->pendingRespawn = true;
         LOG("Respawning player...");
     }
 
@@ -283,7 +283,7 @@ void Scene::LoadScene(SceneID newScene)
         break;
 
     case SceneID::LEVEL2:
-        LOG("Level 2 loaded");
+        LOG("Level 2 loading");
         LoadLevel2();
         LOG("Level 2 loaded");
         break;
