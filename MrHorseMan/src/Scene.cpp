@@ -92,7 +92,7 @@ bool Scene::Update(float dt)
 
 void Scene::uiHpBox() {
         
-        SDL_Rect HPBounds = { 50, 50, 120,20 };
+        SDL_Rect HPBounds = { 50, 50, 90,30 };
         SDL_Rect TextBounds = { 100, 50, 120,20 };
 
         if (currentHP != Engine::GetInstance().scene->player->GetHealth()) {
@@ -102,7 +102,7 @@ void Scene::uiHpBox() {
 			//char const* cstr = playerHealth.c_str();
 		}
         //std::dynamic_pointer_cast<UIHp>(Engine::GetInstance().uiManager->CreateUIElement(UIElementType::HP, 10, "HP: ", HPBounds, this));
-        std::dynamic_pointer_cast<UIHp>(Engine::GetInstance().uiManager->CreateUIHPElement(UIHPElementType::HP, 0, "HP: ", currentHP, HPBounds, this));
+        std::dynamic_pointer_cast<UIHp>(Engine::GetInstance().uiManager->CreateUIHPElement(UIHPElementType::HP, 0, "HP: %s", currentHP, HPBounds, this));
 
 }
 
@@ -345,7 +345,7 @@ void Scene::UnloadCurrentScene() {
 
 void Scene::LoadMainMenu() {
 
-    Engine::GetInstance().audio->PlayMusic("Assets/Audio/Music/retro-gaming-short-248416.wav");
+    Engine::GetInstance().audio->PlayMusic("Assets/Audio/Music/cave.wav");
 
     // Instantiate a UIButton in theScene
     
