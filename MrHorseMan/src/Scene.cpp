@@ -36,7 +36,7 @@ bool Scene::Awake()
 bool Scene::Start()
 {
     //Engine::GetInstance().audio->PlayMusic("Assets/Audio/Music/level-iv-339695.wav");
-	Engine::GetInstance().audio->PlayMusic("Assets/Audio/Music/backAgain.wav");
+	Engine::GetInstance().audio->PlayMusic("Assets/Audio/Music/cave.wav");
     Engine::GetInstance().map->Load("Assets/Maps/", "MapTemplate.tmx");
 
     auto spawnObjects = Engine::GetInstance().map->GetObjects("Spawns");
@@ -356,7 +356,7 @@ void Scene::HandleMainMenuUIEvents(UIElement* uiElement)
 
 void Scene::LoadLevel1() {
 
-    Engine::GetInstance().audio->PlayMusic("Assets/Audio/Music/level-iv-339695.wav");
+    Engine::GetInstance().audio->PlayMusic("Assets/Audio/Music/backAgain.wav");
 
     //Call the function to load the map. 
     Engine::GetInstance().map->Load("Assets/Maps/", "MapTemplate.tmx");
