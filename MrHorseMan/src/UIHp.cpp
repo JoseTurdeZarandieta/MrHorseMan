@@ -3,14 +3,12 @@
 #include "Render.h"
 #include "Engine.h"
 #include "Audio.h"
-#include "Scene.h"
-#include "Player.h"
-#include "EntityManager.h"
 
-UIHp::UIHp(int id, SDL_Rect bounds, const char* text) : UIElement(UIElementType::HP, id) {
-	this->bounds = bounds;
-	this->text = text;
-
+UIHp::UIHp(int id, SDL_Rect bounds, const char* text, int number) : UIHPElement(UIHPElementType::HP, id) {
+	this->HPbounds = bounds;
+	this->HPtext = text;
+	//this->HPnumber = number;
+	
 	canClick = false;
 	drawBasic = false;
 }
@@ -22,27 +20,21 @@ UIHp::~UIHp()
 
 bool UIHp::Update(float dt)
 {
-	if (Engine::GetInstance().scene->GetCurrentScene() == SceneID::MAIN_MENU) {
-		state = UIElementState::DISABLED;
+	Engine::GetInstance().render->DrawRectangle(HPbounds, 0, 0, 20, 255, true, false);
+	Engine::GetInstance().render->DrawText(HPtext.c_str(), HPbounds.x, HPbounds.y, HPbounds.w, HPbounds.h, { 255,255,255,255 });
 
-	}
-	else if (Engine::GetInstance().scene->GetCurrentScene() == SceneID::LEVEL1 || Engine::GetInstance().scene->GetCurrentScene() == SceneID::LEVEL2) {
-		state = UIElementState::NORMAL;
-	}
-	if (state == UIElementState::DISABLED) {
-		return false;
-	}
-	if (state == UIElementState::NORMAL) {
-		int currentHp = Engine::GetInstance().scene->player->health;
-		const char* currentHpStr = std::to_string(currentHp).c_str();
-		Engine::GetInstance().render->DrawText( currentHpStr, bounds.x, bounds.y, bounds.w, bounds.h, { 255,255,255,255 });
-	}
+	//char str[128];
+	//sprintf_s(str, "%8d", HPnumber);
+	//SDL_Surface* sur = TTF_RenderText_Solid(Engine::GetInstance().render->font, str, 128, grayColor);
+	//Engine::GetInstance().render->DrawText(str, HPboundsPlus.x, HPboundsPlus.y, HPboundsPlus.w, HPboundsPlus.h, {255,255,255,255});
 
-	return false;
+
+
+	return true;
 }
 
 bool UIHp::CleanUp()
 {
-	pendingToDelete = true;
+	HPpendingToDelete = true;
 	return true;
 }

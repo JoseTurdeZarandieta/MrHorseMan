@@ -176,6 +176,9 @@
     <ClInclude Include="src\UIHp.h">
       <Filter>Source Files\Engine</Filter>
     </ClInclude>
+    <ClInclude Include="src\UIHPElement.h">
+      <Filter>Source Files\Engine</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Xml Include="config.xml">

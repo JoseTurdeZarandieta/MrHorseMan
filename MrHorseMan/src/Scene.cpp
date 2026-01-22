@@ -13,6 +13,8 @@
 #include "Item.h"
 #include "Enemy.h"
 #include "UIManager.h"
+#include "UIHp.h"
+
 
 Scene::Scene() : Module()
 {
@@ -35,48 +37,8 @@ bool Scene::Awake()
 
 bool Scene::Start()
 {
-    //Engine::GetInstance().audio->PlayMusic("Assets/Audio/Music/level-iv-339695.wav");
-	Engine::GetInstance().audio->PlayMusic("Assets/Audio/Music/cave.wav");
-    Engine::GetInstance().map->Load("Assets/Maps/", "MapTemplate.tmx");
-
-    auto spawnObjects = Engine::GetInstance().map->GetObjects("Spawns");
-
-    for (const auto& object : spawnObjects) {
-        
-        std::string type = object.type;
-        if (type.empty()) {
-            auto it = object.properties.find("type");
-            if (it == object.properties.end()) it = object.properties.find("Type");
-            if (it != object.properties.end()) type = it->second;
-        }
-        if (type.empty()) type = object.name;
-
-        for (auto& c : type) c = (char)std::tolower((unsigned char)c); //omg la deep web
-
-        if (type == "player") {
-            player = std::dynamic_pointer_cast<Player>(Engine::GetInstance().entityManager->CreateEntity(EntityType::PLAYER));
-            if (!player) { LOG("ERROR: Player creation failed"); continue; }
-            player->position = { object.x + 16.0f, object.y + 16.0f };
-            player->spawnPos = player->position;
-        }
-        else if (type == "enemy") {
-            auto enemy = std::dynamic_pointer_cast<Enemy>(Engine::GetInstance().entityManager->CreateEntity(EntityType::ENEMY));
-            enemy->position = { object.x + 16.0f, object.y + 16.0f };
-            enemy->spawnPos = enemy->position;
-        }
-        else if (type == "item") {
-            auto item = std::dynamic_pointer_cast<Item>(Engine::GetInstance().entityManager->CreateEntity(EntityType::ITEM));
-            item->position = { object.x, object.y };
-        }
-        else {
-            LOG("Spawn skipped: unknown type='%s' (name='%s') at (%.1f,%.1f)", type.c_str(), object.name.c_str(), object.x, object.y);
-        }
-    }
-
     return true;
 }
-
-
 
 bool Scene::PreUpdate()
 {
@@ -85,21 +47,6 @@ bool Scene::PreUpdate()
 
 bool Scene::Update(float dt)
 {
-    auto input = Engine::GetInstance().input.get();
-
-    // -------- SAVE GAME (F5) ----------
-    if (input->GetKey(SDL_SCANCODE_F5) == KEY_DOWN)
-    {
-        LOG("Saving game...");
-        SaveGame();
-    }
-
-    // -------- LOAD GAME (F6) ----------
-    if (input->GetKey(SDL_SCANCODE_F6) == KEY_DOWN)
-    {
-        LOG("Loading game...");
-        LoadGame();
-    }
 
     switch (currentScene)
     {
@@ -116,8 +63,49 @@ bool Scene::Update(float dt)
         break;
     }
 
+    auto input = Engine::GetInstance().input.get();
+
+    // -------- SAVE GAME (F5) ----------
+    if (input->GetKey(SDL_SCANCODE_F5) == KEY_DOWN)
+    {
+        LOG("Saving game...");
+        SaveGame();
+    }
+
+    // -------- LOAD GAME (F6) ----------
+    if (input->GetKey(SDL_SCANCODE_F6) == KEY_DOWN)
+    {
+        LOG("Loading game...");
+        LoadGame();
+    }
+
+    // -------- HEAL TO FULLL (F2) ----------
+    if (input->GetKey(SDL_SCANCODE_F2) == KEY_DOWN)
+    {
+        LOG("Healing to full...");
+		Engine::GetInstance().scene->player->HealToFull();
+		LOG("Player health: %d", Engine::GetInstance().scene->player->GetHealth());
+    }
+
     return true;
 }
+
+void Scene::uiHpBox() {
+        
+        SDL_Rect HPBounds = { 50, 50, 120,20 };
+        SDL_Rect TextBounds = { 100, 50, 120,20 };
+
+        if (currentHP != Engine::GetInstance().scene->player->GetHealth()) {
+			currentHP = Engine::GetInstance().scene->player->GetHealth();
+            playerHealth = std::to_string(currentHP).c_str();
+			//std::string playerHealth = std::to_string(currentHP);
+			//char const* cstr = playerHealth.c_str();
+		}
+        //std::dynamic_pointer_cast<UIHp>(Engine::GetInstance().uiManager->CreateUIElement(UIElementType::HP, 10, "HP: ", HPBounds, this));
+        std::dynamic_pointer_cast<UIHp>(Engine::GetInstance().uiManager->CreateUIHPElement(UIHPElementType::HP, 0, "HP: ", currentHP, HPBounds, this));
+
+}
+
 
 bool Scene::SaveGame()
 {
@@ -152,7 +140,6 @@ bool Scene::SaveGame()
     LOG("Game saved!");
     return true;
 }
-
 
 bool Scene::LoadGame()
 {
@@ -204,7 +191,7 @@ bool Scene::LoadGame()
     return true;
 }
 
-// Called each loop iteration
+
 bool Scene::PostUpdate()
 {
 	bool ret = true;
@@ -250,7 +237,6 @@ bool Scene::OnUIMouseClickEvent(UIElement* uiElement)
     return true;
 }
 
-// Called before quitting
 bool Scene::CleanUp()
 {
 	LOG("Freeing scene");
@@ -258,7 +244,6 @@ bool Scene::CleanUp()
 	return true;
 }
 
-// Return the player position
 Vector2D Scene::GetPlayerPosition()
 {
     if (player) return player->GetPosition();
@@ -281,12 +266,51 @@ void Scene::LoadScene(SceneID newScene)
 
     case SceneID::LEVEL1:
         LoadLevel1();
+		LOG("Level 1 loaded");
         break;
 
     case SceneID::LEVEL2:
         LoadLevel2();
         break;
     }
+}
+
+void Scene::LoadSpawning()
+{
+    auto spawnObjects = Engine::GetInstance().map->GetObjects("Spawns");
+
+    for (const auto& object : spawnObjects) {
+
+        std::string type = object.type;
+        if (type.empty()) {
+            auto it = object.properties.find("type");
+            if (it == object.properties.end()) it = object.properties.find("Type");
+            if (it != object.properties.end()) type = it->second;
+        }
+        if (type.empty()) type = object.name;
+
+        for (auto& c : type) c = (char)std::tolower((unsigned char)c); //omg la deep web
+
+        if (type == "player") {
+            player = std::dynamic_pointer_cast<Player>(Engine::GetInstance().entityManager->CreateEntity(EntityType::PLAYER));
+            if (!player) { LOG("ERROR: Player creation failed"); continue; }
+            player->position = { object.x + 16.0f, object.y + 16.0f };
+            player->spawnPos = player->position;
+        }
+        else if (type == "enemy") {
+            auto enemy = std::dynamic_pointer_cast<Enemy>(Engine::GetInstance().entityManager->CreateEntity(EntityType::ENEMY));
+            enemy->position = { object.x + 16.0f, object.y + 16.0f };
+            enemy->spawnPos = enemy->position;
+        }
+        else if (type == "item") {
+            auto item = std::dynamic_pointer_cast<Item>(Engine::GetInstance().entityManager->CreateEntity(EntityType::ITEM));
+            item->position = { object.x, object.y };
+        }
+        else {
+            LOG("Spawn skipped: unknown type='%s' (name='%s') at (%.1f,%.1f)", type.c_str(), object.name.c_str(), object.x, object.y);
+        }
+    }
+
 }
 
 void Scene::ChangeScene(SceneID newScene)
@@ -321,18 +345,32 @@ void Scene::UnloadCurrentScene() {
 
 void Scene::LoadMainMenu() {
 
-    //Engine::GetInstance().audio->PlayMusic("Assets/Audio/Music/retro-gaming-short-248416.wav");
+    Engine::GetInstance().audio->PlayMusic("Assets/Audio/Music/retro-gaming-short-248416.wav");
 
     // Instantiate a UIButton in theScene
     
+    Engine::GetInstance().map->Load("Assets/Maps/", "MainMenu.tmx");
+
     SDL_Rect btPos = { 520, 350, 120,20 };
-    std::dynamic_pointer_cast<UIButton>(Engine::GetInstance().uiManager->CreateUIElement(UIElementType::BUTTON, 1, "MyButton", btPos, this));
-	LOG("Main Menu CREATED");
+    std::dynamic_pointer_cast<UIButton>(Engine::GetInstance().uiManager->CreateUIElement(UIElementType::BUTTON, 1, "Start Game", btPos, this));
+    LOG("Main Menu CREATED");
 }
 
 void Scene::UnloadMainMenu() {
     // Clean up UI elements related to the main menu
-    Engine::GetInstance().uiManager->CleanUp();
+    //Engine::GetInstance().uiManager->CleanUp();
+
+        // Clean up UI elements related to the Level1
+    auto& uiManager = Engine::GetInstance().uiManager;
+    uiManager->CleanUp();
+
+    // Reset player reference (sets the shared_ptr to nullptr)
+    //player.reset();
+
+    // Clean up map and entities
+    Engine::GetInstance().map->CleanUp();
+    Engine::GetInstance().entityManager->CleanUp();
+
 }
 
 void Scene::UpdateMainMenu(float dt) {}
@@ -341,8 +379,8 @@ void Scene::HandleMainMenuUIEvents(UIElement* uiElement)
 {
     switch (uiElement->id)
     {
-    case 1: // Button MyButton
-        LOG("Main Menu: MyButton clicked!");
+    case 1: 
+        LOG("Main Menu: Start GAme clicked!");
         ChangeScene(SceneID::LEVEL1);
         break;
     default:
@@ -356,27 +394,15 @@ void Scene::HandleMainMenuUIEvents(UIElement* uiElement)
 
 void Scene::LoadLevel1() {
 
-    Engine::GetInstance().audio->PlayMusic("Assets/Audio/Music/backAgain.wav");
-
+    Engine::GetInstance().audio->PlayMusic("Assets/Audio/Music/level-iv-339695.wav");
+    
     //Call the function to load the map. 
     Engine::GetInstance().map->Load("Assets/Maps/", "MapTemplate.tmx");
-
-    //Call the function to load entities from the map
-    Engine::GetInstance().map->LoadEntities(player);
-
-    //Create a new item using the entity manager and set the position to (200, 672) to test
-    std::shared_ptr<Item> item = std::dynamic_pointer_cast<Item>(Engine::GetInstance().entityManager->CreateEntity(EntityType::ITEM));
-    //item->position = Vector2D(200, 672);
-    item->Start(); //L17 Important call Start
-
-    //Create a new enemy 
-    std::shared_ptr<Enemy> enemy1 = std::dynamic_pointer_cast<Enemy>(Engine::GetInstance().entityManager->CreateEntity(EntityType::ENEMY));
-    //enemy1->position = Vector2D(384, 672);
-    enemy1->Start(); //L17 Important call Start
+    LoadSpawning();
 }
 
 void Scene::UpdateLevel1(float dt) {
-
+  
     if (Engine::GetInstance().input->GetKey(SDL_SCANCODE_2) == KEY_DOWN) {
         ChangeScene(SceneID::LEVEL2);
     }
@@ -420,10 +446,9 @@ void Scene::LoadLevel2() {
     Engine::GetInstance().audio->PlayMusic("Assets/Audio/Music/that-8-bit-music-322062.wav");
 
     //Call the function to load the map. 
+	
     Engine::GetInstance().map->Load("Assets/Maps/", "SecondMap.tmx");
-
-    //Call the function to load entities from the map
-    Engine::GetInstance().map->LoadEntities(player);
+    LoadSpawning();
 }
 
 void Scene::UpdateLevel2(float dt) {

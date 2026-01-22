@@ -49,6 +49,7 @@ public:
 		texture = NULL;
 	}
 
+
 	// Called each loop iteration
 	virtual bool Update(float dt)
 	{

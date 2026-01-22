@@ -11,6 +11,8 @@
 #include "Map.h"
 #include "Item.h"
 #include "Enemy.h"
+#include "UIHp.h"
+#include "UIManager.h"
 
 
 Player::Player() : Entity(EntityType::PLAYER)
@@ -25,9 +27,10 @@ Player::~Player() {
 bool Player::Awake() {
 
 	//L03: TODO 2: Initialize Player parameters
-	//position = Vector2D(96, 96);
-	spawnPos = position;
+	position = Vector2D(96, 96);
+	/*spawnPos = position;*/
 	health = maxHealth;
+
 	return true;
 }
 
@@ -256,14 +259,6 @@ if (position.getY() - limitUp > 0 && position.getY() < limitDown) {
 Engine::GetInstance().render->DrawTexture(texture, x - texW / 2, y - 1.5* texH, &animFrame, 1.0f, 0.0, INT_MAX, INT_MAX, flip);
 Engine::GetInstance().render->DrawTexture(texture, x - texW / 2, y - 1.5 * texH, &animFrame, 1.0f, 0.0, INT_MAX, INT_MAX, flip);
 
-//health screen display TODO NEXT TIME. THIS TIME, NO UI REQUIRED
-char hpText[32];
-snprintf(hpText, sizeof(hpText), "HP: %d", health);
-
-int screenW = Engine::GetInstance().render->camera.w;
-int margin = 12;
-int posTextX = screenW - 120;
-int posTextY = margin;
 
 
 return true;
@@ -281,6 +276,11 @@ bool Player::CleanUp()
 // L08 TODO 6: Define OnCollision function for the player. 
 void Player::OnCollision(PhysBody* physA, PhysBody* physB) {
 	
+	if (OnCollisionCounter = 0) {
+		Engine::GetInstance().scene->uiHpBox();
+		LOG("UIHPBOX ONCOLLISION");
+	}
+
 	switch (physB->ctype)
 	{	
 	case ColliderType::PLATFORM:
@@ -365,7 +365,10 @@ void Player::OnCollision(PhysBody* physA, PhysBody* physB) {
 		{
 
 			if (!godMode) {
+				previousHealth = health;
 				TakeDamage(10);
+				//Engine::GetInstance().scene->currentHP = health;
+				Engine::GetInstance().scene->uiHpBox();
 				LOG("Collision Enemy. Health %d", health);
 			}
 		}
@@ -384,7 +387,10 @@ void Player::OnCollision(PhysBody* physA, PhysBody* physB) {
 	default:
 		break;
 	}
+	OnCollisionCounter++;
 }
+
+
 
 void Player::OnCollisionEnd(PhysBody* physA, PhysBody* physB)
 {

@@ -62,12 +62,16 @@ public:
 	void UnloadCurrentScene();
 	void LoadScene(SceneID newScene);
 
+	void uiHpBox();
+	int currentHP = 101;
+
 	SceneID GetCurrentScene() const;
 
 	std::shared_ptr<Player> player;
 
 private:
 
+	void LoadSpawning();
 	// L17 TODO 3: Define specific function for main menu scene: Load, Unload, Handle UI events
 	void LoadMainMenu();
 	void UnloadMainMenu();
@@ -96,4 +100,6 @@ private:
 	float volume = 1.0;
 
 	SceneID currentScene = SceneID::MAIN_MENU;
+
+	const char* playerHealth;
 };

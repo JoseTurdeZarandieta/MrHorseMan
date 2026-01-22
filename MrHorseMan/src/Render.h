@@ -49,7 +49,7 @@ public:
 	SDL_Rect viewport;
 	SDL_Color background;
 
+	TTF_Font* font;
 private:
 	bool vsync = false;
-	TTF_Font* font;
 };
