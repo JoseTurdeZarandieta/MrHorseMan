@@ -102,7 +102,7 @@ void Scene::uiHpBox() {
 			//char const* cstr = playerHealth.c_str();
 		}
         //std::dynamic_pointer_cast<UIHp>(Engine::GetInstance().uiManager->CreateUIElement(UIElementType::HP, 10, "HP: ", HPBounds, this));
-        std::dynamic_pointer_cast<UIHp>(Engine::GetInstance().uiManager->CreateUIHPElement(UIHPElementType::HP, 0, "HP: %d", currentHP, HPBounds, this));
+        std::dynamic_pointer_cast<UIHp>(Engine::GetInstance().uiManager->CreateUIHPElement(UIHPElementType::HP, 0, "HP: ", currentHP, HPBounds, this));
 
 }
 
