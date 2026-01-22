@@ -507,6 +507,8 @@ void Scene::UnloadLevel2() {
 
 }
 
+
+
 SceneID Scene::GetCurrentScene() const
 {
     return currentScene;

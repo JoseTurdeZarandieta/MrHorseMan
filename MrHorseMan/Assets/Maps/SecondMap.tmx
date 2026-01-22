@@ -26082,13 +26082,13 @@
   <properties>
    <property name="Draw" type="bool" value="true"/>
   </properties>
-  <object id="13" name="ItemSpawn" x="2472.48" y="1871.82">
+  <object id="13" name="ItemSpawn" x="2263.39" y="880.911">
    <properties>
     <property name="type" value="item"/>
    </properties>
    <point/>
   </object>
-  <object id="16" name="EnemySpawn" x="2510.31" y="1877.7">
+  <object id="16" name="EnemySpawn" x="2301.22" y="886.791">
    <properties>
     <property name="type" value="enemy"/>
    </properties>

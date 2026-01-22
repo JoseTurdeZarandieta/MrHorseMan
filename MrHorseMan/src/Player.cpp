@@ -76,18 +76,18 @@ bool Player::Start() {
 bool Player::Update(float dt)
 {
 	Physics* physics = Engine::GetInstance().physics.get();
-	
 
-	if (pendingRespawn == true) {
+
+	if (pendingRespawn != false) {
 		pendingRespawn = false;
 		Respawn();
-		respawnCounter = respawnCounter +1;
+		respawnCounter = respawnCounter + 1;
 	}
-	//if (respawnCounter = 1) {
-	//	//Engine::GetInstance().scene->LoadScene(SceneID::LEVEL1);
-	//	LOG("Respawning Player at spawn point");
-	//	respawnCounter = respawnCounter+1;
-	//}
+	if (respawnCounter = 1) {
+		//Engine::GetInstance().scene->LoadScene(SceneID::LEVEL1);
+		LOG("Respawning Player at spawn point");
+		respawnCounter = respawnCounter+1;
+	}
 
 	if (Engine::GetInstance().input->GetKey(SDL_SCANCODE_H) == KEY_DOWN)
 	{
@@ -404,7 +404,6 @@ void Player::OnCollision(PhysBody* physA, PhysBody* physB) {
 		break;
 	case ColliderType::CHANGELEVEL_TRIGGER2:
 		LOG("Collision CHANGELEVEL TRIGGER2");
-		Engine::GetInstance().scene->UnloadCurrentScene();
 		Engine::GetInstance().scene->ChangeScene(SceneID::END_MENU);
 		break;
 	case ColliderType::UNKNOWN:
