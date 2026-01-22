@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="88" height="59" tilewidth="32" tileheight="32" infinite="0" nextlayerid="16" nextobjectid="88">
+<map version="1.10" tiledversion="1.11.0" orientation="orthogonal" renderorder="right-down" width="88" height="59" tilewidth="32" tileheight="32" infinite="0" nextlayerid="16" nextobjectid="89">
  <properties>
   <property name="Draw" type="bool" value="true"/>
  </properties>
@@ -26090,6 +26090,12 @@
   <object id="16" name="EnemySpawn" x="2510.31" y="1877.7">
    <properties>
     <property name="type" value="enemy"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="88" name="PlayerSpawn" x="180.292" y="198.851">
+   <properties>
+    <property name="type" value="player"/>
    </properties>
    <point/>
   </object>

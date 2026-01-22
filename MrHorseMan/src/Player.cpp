@@ -11,6 +11,7 @@
 #include "Map.h"
 #include "Item.h"
 #include "Enemy.h"
+#include "ChangeLevel.h"
 #include "UIHp.h"
 #include "UIManager.h"
 
@@ -26,17 +27,17 @@ Player::~Player() {
 
 bool Player::Awake() {
 
-	//L03: TODO 2: Initialize Player parameters
-	position = Vector2D(96, 96);
-	/*spawnPos = position;*/
-	health = maxHealth;
 
+	Physics* physics = Engine::GetInstance().physics.get();
+	//L03: TODO 2: Initialize Player parameters
+	position = Vector2D(1000, 102);
+	spawnPos = position;
+	health = maxHealth;
+	pendingRespawn = false;
 	return true;
 }
 
 bool Player::Start() {
-
-	spawnPos = position;
 
 	texture = Engine::GetInstance().textures->Load("Assets/Textures/MrHorseMan_spritesheet.png");
 
@@ -67,20 +68,24 @@ bool Player::Start() {
 	dashFX = Engine::GetInstance().audio->LoadFx("Assets/Audio/Fx/dash.wav");
 	enemiDiedFx = Engine::GetInstance().audio->LoadFx("Assets/Audio/Fx/enemy_dead.wav");
 
+	pendingRespawn = false;
 	return true;
 }
 
 bool Player::Update(float dt)
 {
 	Physics* physics = Engine::GetInstance().physics.get();
+	
 
-	if (pendingRespawn) {
+	if (pendingRespawn == true) {
 		pendingRespawn = false;
 		Respawn();
+		respawnCounter++;
 	}
-
-	if (Engine::GetInstance().input->GetKey(SDL_SCANCODE_F1) == KEY_DOWN && dashed == false && (isJumping == true || isGrounded == true)) {
-		Respawn();
+	if (respawnCounter = 1) {
+		//Engine::GetInstance().scene->LoadScene(SceneID::LEVEL1);
+		LOG("Respawning Player at spawn point");
+		respawnCounter++;
 	}
 
 	if (Engine::GetInstance().input->GetKey(SDL_SCANCODE_H) == KEY_DOWN)
@@ -227,8 +232,8 @@ if (!dashing) {
 	physics->SetLinearVelocity(pbody, velocity);
 }
 
-if (health <= 0) {
-	Respawn();
+if (health <= 0 && (Engine::GetInstance().scene->GetCurrentScene() != SceneID::MAIN_MENU)) {
+	pendingRespawn = true;
 }
 // L10: TODO 5: Update the animation based on the player's state (moving, jumping, idle)
 anims.Update(dt);
@@ -312,7 +317,7 @@ void Player::OnCollision(PhysBody* physA, PhysBody* physB) {
 				dmg = (int)(t * 120.0f);
 				TakeDamage(dmg);
 			}
-			LOG("jump x platform. dmg %d\Current Health %d", dmg, health);
+			LOG("jump x platform. dmg %d\nCurrent Health %d", dmg, health);
 			maxDownwardSpeed = 0.0f;
 		}
 		//reset the jump flag when touching the ground
@@ -321,7 +326,6 @@ void Player::OnCollision(PhysBody* physA, PhysBody* physB) {
 		dashed = false;
 		dashing = false;
 		//L10: TODO 6: Update the animation based on the player's state
-		LOG("Collision PLATFORM");
 		break;
 	}
 	case ColliderType::ITEM:
@@ -381,6 +385,17 @@ void Player::OnCollision(PhysBody* physA, PhysBody* physB) {
 			pendingRespawn = true;
 		}
 		break;
+	case ColliderType::CHANGELEVEL:
+		LOG("Collision CHANGELEVEL");
+		if (physB && physB->listener) {
+
+			if (auto* changelevel = dynamic_cast<ChangeLevel*>(physB->listener)) {
+				changelevel->isPicked = true;
+			}
+
+			physB->listener->Destroy();
+		}
+
 	case ColliderType::UNKNOWN:
 		LOG("Collision UNKNOWN");
 		break;
@@ -407,6 +422,9 @@ void Player::OnCollisionEnd(PhysBody* physA, PhysBody* physB)
 		break;
 	case ColliderType::DEATHZONE:
 		LOG("End Collision DEATHZONE");
+		break;
+	case ColliderType::CHANGELEVEL:
+		LOG("End Collision CHANGELEVEL");
 		break;
 	case ColliderType::UNKNOWN:
 		LOG("End Collision UNKNOWN");
@@ -460,6 +478,6 @@ void Player::Respawn() {
 	
 	Engine::GetInstance().render->camera.x = position.getX();
 	Engine::GetInstance().render->camera.y = position.getY();
-	Engine::GetInstance().entityManager->resetEnemiesToSpwan();
+	Engine::GetInstance().entityManager->resetLevelToSpwan();
 	LOG("Player respawned at (%.1f, %.1f)", spawnPos.getX(), spawnPos.getY());
 }

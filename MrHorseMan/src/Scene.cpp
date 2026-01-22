@@ -11,6 +11,7 @@
 #include "Player.h"
 #include "Map.h"
 #include "Item.h"
+#include "ChangeLevel.h"
 #include "Enemy.h"
 #include "UIManager.h"
 #include "UIHp.h"
@@ -19,6 +20,7 @@
 Scene::Scene() : Module()
 {
 	name = "scene";
+
 }
 
 // Destructor
@@ -28,6 +30,7 @@ Scene::~Scene()
 // Called before render is available
 bool Scene::Awake()
 {
+    currentScene = SceneID::MAIN_MENU;
 	LOG("Loading Scene");
     LoadScene(currentScene);
 	bool ret = true;
@@ -56,9 +59,13 @@ bool Scene::Update(float dt)
         UpdateMainMenu(dt);
         break;
     case SceneID::LEVEL1:
+		Level1 = true;
+		Level2 = false;
         UpdateLevel1(dt);
         break;
     case SceneID::LEVEL2:
+		Level2 = true;
+		Level1 = false;
         UpdateLevel2(dt);
         break;
     }
@@ -85,6 +92,11 @@ bool Scene::Update(float dt)
         LOG("Healing to full...");
 		Engine::GetInstance().scene->player->HealToFull();
 		LOG("Player health: %d", Engine::GetInstance().scene->player->GetHealth());
+    }
+    if (input->GetKey(SDL_SCANCODE_F3) == KEY_DOWN)
+    {
+		Engine::GetInstance().scene->player->Respawn();
+        LOG("Respawning player...");
     }
 
     return true;
@@ -265,12 +277,15 @@ void Scene::LoadScene(SceneID newScene)
         break;
 
     case SceneID::LEVEL1:
+        LOG("Loading Level1");
         LoadLevel1();
 		LOG("Level 1 loaded");
         break;
 
     case SceneID::LEVEL2:
+        LOG("Level 2 loaded");
         LoadLevel2();
+        LOG("Level 2 loaded");
         break;
     }
 }
@@ -294,17 +309,31 @@ void Scene::LoadSpawning()
         if (type == "player") {
             player = std::dynamic_pointer_cast<Player>(Engine::GetInstance().entityManager->CreateEntity(EntityType::PLAYER));
             if (!player) { LOG("ERROR: Player creation failed"); continue; }
-            player->position = { object.x + 16.0f, object.y + 16.0f };
-            player->spawnPos = player->position;
+            /*player->position = { object.x + 16.0f, object.y + 16.0f };
+            player->spawnPos = player->position;*/
+            LOG("Player spawned at (%.1f, %.1f)", object.x, object.y);
+            continue;
         }
         else if (type == "enemy") {
             auto enemy = std::dynamic_pointer_cast<Enemy>(Engine::GetInstance().entityManager->CreateEntity(EntityType::ENEMY));
-            enemy->position = { object.x + 16.0f, object.y + 16.0f };
+            enemy->position = { object.x + 30.0f, object.y + 16.0f };
             enemy->spawnPos = enemy->position;
+            LOG("Enemy spawned at (%.1f, %.1f)", object.x, object.y);
+
         }
         else if (type == "item") {
             auto item = std::dynamic_pointer_cast<Item>(Engine::GetInstance().entityManager->CreateEntity(EntityType::ITEM));
+            if (!item) { LOG("ERROR: item creation failed"); continue; }
             item->position = { object.x, object.y };
+			item->spawnPos = item->position;
+			LOG("Item spawned at (%.1f, %.1f)", object.x, object.y);
+        }
+        else if (type == "changelevel") {
+            auto changelevel = std::dynamic_pointer_cast<ChangeLevel>(Engine::GetInstance().entityManager->CreateEntity(EntityType::ChangeLevel));
+            if (!changelevel) { LOG("ERROR: change level creation failed"); continue; }
+            changelevel->position = { object.x, object.y };
+			changelevel->spawnPos = changelevel->position;
+			LOG("ChangeLevel spawned at (%.1f, %.1f)", object.x, object.y);
         }
         else {
             LOG("Spawn skipped: unknown type='%s' (name='%s') at (%.1f,%.1f)", type.c_str(), object.name.c_str(), object.x, object.y);
@@ -315,6 +344,7 @@ void Scene::LoadSpawning()
 
 void Scene::ChangeScene(SceneID newScene)
 {
+	SceneID previousScene = currentScene;
     UnloadCurrentScene();
     currentScene = newScene;
     LoadScene(currentScene);
@@ -365,12 +395,15 @@ void Scene::UnloadMainMenu() {
     uiManager->CleanUp();
 
     // Reset player reference (sets the shared_ptr to nullptr)
-    //player.reset();
+    player.reset();
 
     // Clean up map and entities
     Engine::GetInstance().map->CleanUp();
     Engine::GetInstance().entityManager->CleanUp();
 
+    
+	LoadSpawning();
+    
 }
 
 void Scene::UpdateMainMenu(float dt) {}
@@ -381,6 +414,7 @@ void Scene::HandleMainMenuUIEvents(UIElement* uiElement)
     {
     case 1: 
         LOG("Main Menu: Start GAme clicked!");
+		//UnloadCurrentScene();
         ChangeScene(SceneID::LEVEL1);
         break;
     default:
@@ -412,15 +446,17 @@ void Scene::UpdateLevel1(float dt) {
 void Scene::UnloadLevel1() {
 
     // Clean up UI elements related to the Level1
-    auto& uiManager = Engine::GetInstance().uiManager;
-    uiManager->CleanUp();
+    /*auto& uiManager = Engine::GetInstance().uiManager;
+    uiManager->CleanUp();*/
 
     // Reset player reference (sets the shared_ptr to nullptr)
-    player.reset();
+    //player.reset();
 
     // Clean up map and entities
     Engine::GetInstance().map->CleanUp();
     Engine::GetInstance().entityManager->CleanUp();
+
+    LoadSpawning();
 
 }
 
@@ -446,7 +482,6 @@ void Scene::LoadLevel2() {
     Engine::GetInstance().audio->PlayMusic("Assets/Audio/Music/that-8-bit-music-322062.wav");
 
     //Call the function to load the map. 
-	
     Engine::GetInstance().map->Load("Assets/Maps/", "SecondMap.tmx");
     LoadSpawning();
 }

@@ -1,4 +1,4 @@
-#include "Item.h"
+#include "ChangeLevel.h"
 #include "Engine.h"
 #include "Textures.h"
 #include "Audio.h"
@@ -9,37 +9,35 @@
 #include "Physics.h"
 #include "EntityManager.h"
 
-Item::Item() : Entity(EntityType::ITEM)
+ChangeLevel::ChangeLevel() : Entity(EntityType::ChangeLevel)
 {
-	name = "item";
+	name = "changelevel";
 }
 
-Item::~Item() {}
+ChangeLevel::~ChangeLevel() {}
 
-bool Item::Awake() {
+bool ChangeLevel::Awake() {
 	spawnPos = position;
 	return true;
 }
 
-bool Item::Start() {
+bool ChangeLevel::Start() {
+
+	spawnPos = position;
 
 	//initilize textures
 	texture = Engine::GetInstance().textures->Load("Assets/Textures/goldCoin.png");
 	
-	// L08 TODO 4: Add a physics to an item - initialize the physics body
 	Engine::GetInstance().textures.get()->GetSize(texture, texW, texH);
-	pbody = Engine::GetInstance().physics->CreateCircle((int)position.getX() + texH / 2, (int)position.getY() + texH / 2, texH / 2, bodyType::DYNAMIC);
+	pbody = Engine::GetInstance().physics->CreateCircle((int)position.getX() + texH / 2, (int)position.getY() + texH / 2, texH / 2, bodyType::STATIC);
+	pbody->ctype = ColliderType::CHANGELEVEL;
 
-	// L08 TODO 7: Assign collider type
-	pbody->ctype = ColliderType::ITEM;
-
-	// Set this class as the listener of the pbody
-	pbody->listener = this;   // so Begin/EndContact can call back to Item
+	pbody->listener = this;   
 
 	return true;
 }
 
-bool Item::Update(float dt)
+bool ChangeLevel::Update(float dt)
 {
 	if (!active) return true;
 
@@ -49,6 +47,7 @@ bool Item::Update(float dt)
 	position.setX((float)x);
 	position.setY((float)y);
 
+	Vector2D pos = { (float)(x - texW / 2), (float)(y - texH / 2) };
 	Engine::GetInstance().render->DrawTexture(texture, x - texW / 2, y - texH / 2);
 
 	if (isPicked) {
@@ -60,18 +59,24 @@ bool Item::Update(float dt)
 			pbody = nullptr;
 		}
 		Engine::GetInstance().entityManager->DestroyEntity(shared_from_this());
+
+		if (Engine::GetInstance().scene->Level1 == true) {
+			Engine::GetInstance().scene->ChangeScene(SceneID::LEVEL2);
+			LOG("Loading LEVEL 2");
+		}
+		else if (Engine::GetInstance().scene->Level2 == true) {
+			LOG("LEVEL FINISHED");
+			Engine::GetInstance().scene->ChangeScene(SceneID::END_MENU);
+			LOG("Loading End menu");
+		}
+
 		return true;
 	}
 
 	return true;
 }
 
-void Item::ResetToSpawn() {
-	Physics* physics = Engine::GetInstance().physics.get();
-	physics->SetTransform(pbody, spawnPos.getX(), spawnPos.getY());
-}
-
-bool Item::CleanUp()
+bool ChangeLevel::CleanUp()
 {
 	Engine::GetInstance().textures->UnLoad(texture);
 	if (pbody) {
@@ -83,7 +88,12 @@ bool Item::CleanUp()
 	return true;
 }
 
-bool Item::Destroy()
+void ChangeLevel::ResetToSpawn() {
+	Physics* physics = Engine::GetInstance().physics.get();
+	physics->SetTransform(pbody, spawnPos.getX(), spawnPos.getY());
+}
+
+bool ChangeLevel::Destroy()
 {
 	LOG("Destroying item");
 	active = false;

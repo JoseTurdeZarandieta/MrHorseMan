@@ -11,7 +11,8 @@ enum class SceneID
 	INTRO_SCREEN,
 	MAIN_MENU,
 	LEVEL1,
-	LEVEL2
+	LEVEL2,
+	END_MENU
 };
 
 class Scene : public Module
@@ -69,6 +70,9 @@ public:
 
 	std::shared_ptr<Player> player;
 
+	bool Level1 = false;
+	bool Level2 = false;
+
 private:
 
 	void LoadSpawning();
@@ -99,7 +103,7 @@ private:
 	std::shared_ptr<UIButton> uiBt;
 	float volume = 1.0;
 
-	SceneID currentScene = SceneID::MAIN_MENU;
+	SceneID currentScene;
 
 	const char* playerHealth;
 };

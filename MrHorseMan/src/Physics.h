@@ -30,6 +30,7 @@ enum class ColliderType {
     PLATFORM,
     ENEMY,
     DEATHZONE,
+    CHANGELEVEL,
     UNKNOWN
     // ..
 };

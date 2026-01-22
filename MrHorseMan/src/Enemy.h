@@ -41,7 +41,7 @@ public:
 
 	int health = 50;
 	int maxHealth = 50;
-	Vector2D spawnPos = { 96,96 };
+	Vector2D spawnPos;
 
 	bool playerOnRange;
 	int detectRange = 6;

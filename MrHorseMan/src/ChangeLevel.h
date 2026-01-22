@@ -5,12 +5,12 @@
 
 struct SDL_Texture;
 
-class Item : public Entity
+class ChangeLevel : public Entity
 {
 public:
 
-	Item();
-	virtual ~Item();
+	ChangeLevel();
+	virtual ~ChangeLevel();
 
 	bool Awake();
 
@@ -24,16 +24,14 @@ public:
 
 	void ResetToSpawn();
 
-public:
-
 	bool isPicked = false;
 	Vector2D spawnPos;
+	int texW, texH;
 
 private:
 
 	SDL_Texture* texture;
 	const char* texturePath;
-	int texW, texH;
 
 	//L08 TODO 4: Add a physics to an item
 	PhysBody* pbody;

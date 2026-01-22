@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.0" orientation="orthogonal" renderorder="right-down" width="88" height="59" tilewidth="32" tileheight="32" infinite="0" nextlayerid="16" nextobjectid="82">
+<map version="1.10" tiledversion="1.11.0" orientation="orthogonal" renderorder="right-down" width="88" height="59" tilewidth="32" tileheight="32" infinite="0" nextlayerid="17" nextobjectid="88">
  <properties>
   <property name="Draw" type="bool" value="true"/>
  </properties>
@@ -26084,7 +26084,7 @@
    </properties>
    <point/>
   </object>
-  <object id="9" name="EnemySpawn" x="1372.67" y="282">
+  <object id="9" name="EnemySpawn" x="1994.67" y="326">
    <properties>
     <property name="type" value="enemy"/>
    </properties>
@@ -26135,6 +26135,12 @@
   <object id="81" name="ItemSpawn" x="2481.83" y="318.833">
    <properties>
     <property name="type" value="item"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="87" name="ChangeLevelSpawn" x="1028" y="296">
+   <properties>
+    <property name="type" value="changelevel"/>
    </properties>
    <point/>
   </object>

@@ -1,11 +1,13 @@
 #include "EntityManager.h"
 #include "Enemy.h"
+#include "ChangeLevel.h"
 #include "Player.h"
 #include "Engine.h"
 #include "Textures.h"
 #include "Scene.h"
 #include "Log.h"
 #include "Item.h"
+#include "ChangeLevel.h"
 #include "Entity.h"
 
 EntityManager::EntityManager() : Module()
@@ -83,6 +85,10 @@ std::shared_ptr<Entity> EntityManager::CreateEntity(EntityType type)
 		entity = std::make_shared<Enemy>();
 		entity->Start();
 		break;
+	case EntityType::ChangeLevel:
+		entity = std::make_shared<ChangeLevel>();
+		entity->Start();
+		break;
 	default:
 		break;
 	}
@@ -103,12 +109,22 @@ void EntityManager::AddEntity(std::shared_ptr<Entity> entity)
 	if ( entity != nullptr) entities.push_back(entity);
 }
 
-void EntityManager::resetEnemiesToSpwan() {
+void EntityManager::resetLevelToSpwan() {
 	for (auto& entity : entities) {
 		if (entity->type == EntityType::ENEMY)
 			static_cast<Enemy*>(entity.get())->ResetToSpawn();
+		if (entity->type == EntityType::ITEM)
+			static_cast<Item*>(entity.get())->ResetToSpawn();
+		if (entity->type == EntityType::ChangeLevel)
+			static_cast<ChangeLevel*>(entity.get())->ResetToSpawn();
+	}
+	for (auto& entity : entities) {
+
 	}
 }
+
+
+
 
 bool EntityManager::Update(float dt)
 {
