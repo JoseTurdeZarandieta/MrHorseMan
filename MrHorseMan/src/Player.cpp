@@ -83,7 +83,7 @@ bool Player::Update(float dt)
 		Respawn();
 		respawnCounter = respawnCounter + 1;
 	}
-	if (respawnCounter = 1) {
+	if (respawnCounter == 1) {
 		//Engine::GetInstance().scene->LoadScene(SceneID::LEVEL1);
 		LOG("Respawning Player at spawn point");
 		respawnCounter = respawnCounter+1;
@@ -233,8 +233,12 @@ if (!dashing) {
 	physics->SetLinearVelocity(pbody, velocity);
 }
 
-if (health <= 0 && (Engine::GetInstance().scene->GetCurrentScene() != SceneID::MAIN_MENU)) {
+if (health <= 0) {
 	pendingRespawn = true;
+}
+else if (health > 0) {
+	pendingRespawn = false;
+
 }
 // L10: TODO 5: Update the animation based on the player's state (moving, jumping, idle)
 anims.Update(dt);
@@ -484,7 +488,7 @@ void Player::Respawn() {
 	physics->SetLinearVelocity(pbody, { 0,0 });
 	physics->SetTransform(pbody, spawnPos.getX(), spawnPos.getY());
 
-	position = spawnPos;
+	position = { 80, 201 };
 	isJumping = false;
 	isGrounded = false;
 	dashed = false;
@@ -496,5 +500,5 @@ void Player::Respawn() {
 	Engine::GetInstance().render->camera.x = position.getX();
 	Engine::GetInstance().render->camera.y = position.getY();
 	Engine::GetInstance().entityManager->resetLevelToSpwan();
-	LOG("Player respawned at (%.1f, %.1f)", spawnPos.getX(), spawnPos.getY());
+	LOG("Player respawned at (%.1f, %.1f)", position.getX(), position.getY());
 }

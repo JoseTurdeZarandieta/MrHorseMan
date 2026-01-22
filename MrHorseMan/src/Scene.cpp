@@ -103,20 +103,19 @@ bool Scene::Update(float dt)
 }
 
 void Scene::uiHpBox() {
-        
-        SDL_Rect HPBounds = { 50, 50, 90,30 };
-        SDL_Rect TextBounds = { 100, 50, 120,20 };
 
-        if (currentHP != Engine::GetInstance().scene->player->GetHealth()) {
-			currentHP = Engine::GetInstance().scene->player->GetHealth();
-            playerHealth = std::to_string(currentHP).c_str();
-			//std::string playerHealth = std::to_string(currentHP);
-			//char const* cstr = playerHealth.c_str();
-		}
-        //std::dynamic_pointer_cast<UIHp>(Engine::GetInstance().uiManager->CreateUIElement(UIElementType::HP, 10, "HP: ", HPBounds, this));
-        std::dynamic_pointer_cast<UIHp>(Engine::GetInstance().uiManager->CreateUIHPElement(UIHPElementType::HP, 0, "HP: %s", currentHP, HPBounds, this));
+    SDL_Rect HPBounds = { 50, 50, 90,30 };
+    SDL_Rect TextBounds = { 100, 50, 120,20 };
 
+    if (currentHP != Engine::GetInstance().scene->player->GetHealth()) {
+        currentHP = Engine::GetInstance().scene->player->GetHealth();
+        std::string hpText = "HP: " + std::to_string(Engine::GetInstance().scene->player->GetHealth()); 
+        std::dynamic_pointer_cast<UIHp>(Engine::GetInstance().uiManager->CreateUIHPElement(UIHPElementType::HP, 0, hpText.c_str(), 1, HPBounds, this));
+
+    }
 }
+
+
 
 
 bool Scene::SaveGame()

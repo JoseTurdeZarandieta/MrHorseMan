@@ -56,10 +56,10 @@ bool Item::Update(float dt)
 
 		if (pbody) {
 			pbody->listener = nullptr;
-			Engine::GetInstance().physics->DeletePhysBody(pbody);
+			pendingToDelete = true;
 			pbody = nullptr;
 		}
-		Engine::GetInstance().entityManager->DestroyEntity(shared_from_this());
+		pendingToDelete = true;
 		return true;
 	}
 
